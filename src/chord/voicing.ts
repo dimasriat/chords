@@ -127,6 +127,19 @@ function candidatesPerString(tones: ChordTones): number[][] {
   return options;
 }
 
+/** True when `v` plays a strict subset of `w`'s strings at the same frets. */
+function isStringSubset(v: number[], w: number[]): boolean {
+  let fewer = false;
+  for (let i = 0; i < STRINGS; i++) {
+    if (v[i] === MUTED) {
+      if (w[i] !== MUTED) fewer = true;
+    } else if (w[i] !== v[i]) {
+      return false;
+    }
+  }
+  return fewer;
+}
+
 export function generateVoicings(input: string | ParsedChord): Voicing[] {
   const tones = computeChordTones(input);
   const perString = candidatesPerString(tones);
@@ -158,7 +171,19 @@ export function generateVoicings(input: string | ParsedChord): Voicing[] {
   };
 
   recurse(0);
-  return results;
+
+  // Drop voicings that are just a string-subset of a fuller one (same fingering, some
+  // strings muted) — UNLESS the subset avoids a barre the fuller shape needs (then
+  // it's a genuinely easier alternative, e.g. the top-4 "F" vs the full barre).
+  return results.filter(
+    (v) =>
+      !results.some(
+        (w) =>
+          w !== v &&
+          isStringSubset(v.frets, w.frets) &&
+          !(w.features.hasBarre && !v.features.hasBarre),
+      ),
+  );
 }
 
 /** Does this voicing of the given chord leave out the chord's 3rd? (UI badge.) */

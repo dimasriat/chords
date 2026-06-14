@@ -77,6 +77,18 @@ describe("generateVoicings", () => {
     expect(generateVoicings("Bm9").length).toBeGreaterThan(0);
   });
 
+  test("collapses string-subsets to the fullest shape (Em → 022000, not xx2000)", () => {
+    const frets = generateVoicings("Em").map((v) => v.frets);
+    expect(has(frets, [0, 2, 2, 0, 0, 0])).toBe(true); // full open Em kept
+    expect(has(frets, [-1, -1, 2, 0, 0, 0])).toBe(false); // subset xx2000 removed
+    expect(has(frets, [0, 2, 2, 0, 0, -1])).toBe(false); // subset 02200x removed
+  });
+
+  test("keeps a subset that avoids a barre (top-4 F vs the full barre)", () => {
+    const frets = generateVoicings("F").map((v) => v.frets);
+    expect(has(frets, [-1, -1, 3, 2, 1, 1])).toBe(true); // easy top-4 F survives
+  });
+
   test("each voicing carries notes and features", () => {
     const v = generateVoicings("D")[0]!;
     expect(v.notes.length).toBeGreaterThanOrEqual(4);
