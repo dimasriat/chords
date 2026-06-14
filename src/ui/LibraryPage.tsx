@@ -2,7 +2,7 @@
 
 import React from "react";
 import { ChordCard } from "./ChordCard";
-import { playVoicing } from "./audio";
+import { usePlayer } from "./PlayerContext";
 import type { LibraryEntry } from "./api";
 
 interface LibraryPageProps {
@@ -11,6 +11,7 @@ interface LibraryPageProps {
 }
 
 export function LibraryPage({ library, onDelete }: LibraryPageProps) {
+  const { play } = usePlayer();
   if (library.length === 0) {
     return <p className="text-muted">No saved chords yet — add some from Find or Chord Finder.</p>;
   }
@@ -21,7 +22,7 @@ export function LibraryPage({ library, onDelete }: LibraryPageProps) {
           <ChordCard symbol={e.symbol} frets={e.voicing}>
             <button
               className="btn btn-sm btn-outline-secondary flex-fill"
-              onClick={() => playVoicing(e.voicing)}
+              onClick={() => play(e.voicing)}
             >
               ▶︎
             </button>

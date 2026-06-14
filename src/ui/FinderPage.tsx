@@ -4,11 +4,12 @@ import React, { useState } from "react";
 import { InteractiveFretboard } from "./InteractiveFretboard";
 import { nameChord } from "../chord/chordNamer";
 import { resolveMidi, resolveNoteNames } from "../chord/noteResolver";
-import { playVoicing } from "./audio";
+import { usePlayer } from "./PlayerContext";
 
 const EMPTY = [-1, -1, -1, -1, -1, -1];
 
 export function FinderPage({ onSave }: { onSave: (symbol: string, frets: number[]) => void }) {
+  const { play } = usePlayer();
   const [frets, setFrets] = useState<number[]>(EMPTY);
 
   const pcs = resolveMidi(frets).map((m) => m % 12);
@@ -38,7 +39,7 @@ export function FinderPage({ onSave }: { onSave: (symbol: string, frets: number[
         <button
           className="btn btn-outline-secondary"
           disabled={!sounding}
-          onClick={() => playVoicing(frets)}
+          onClick={() => play(frets)}
         >
           ▶︎ Play
         </button>

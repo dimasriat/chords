@@ -2,12 +2,13 @@
 
 import React from "react";
 
-export type Tab = "find" | "library" | "finder";
+export type Tab = "find" | "library" | "finder" | "settings";
 
 const TABS: Array<{ id: Tab; label: string }> = [
   { id: "find", label: "Find" },
-  { id: "library", label: "My Library" },
-  { id: "finder", label: "Chord Finder" },
+  { id: "library", label: "Library" },
+  { id: "finder", label: "Finder" },
+  { id: "settings", label: "⚙" },
 ];
 
 export function Navbar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {

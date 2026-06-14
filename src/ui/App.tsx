@@ -8,12 +8,15 @@ import { Navbar, type Tab } from "./Navbar";
 import { FindPage } from "./FindPage";
 import { LibraryPage } from "./LibraryPage";
 import { FinderPage } from "./FinderPage";
+import { SettingsPage } from "./SettingsPage";
+import { usePlayer } from "./PlayerContext";
 import { fetchLibrary, saveChord, removeChord, type LibraryEntry } from "./api";
 
 export function App() {
   const [tab, setTab] = useState<Tab>("find");
   const [library, setLibrary] = useState<LibraryEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const { isPlaying, stop, settings } = usePlayer();
 
   useEffect(() => {
     fetchLibrary().then(setLibrary).catch(() => setError("Couldn't load your library."));
@@ -45,7 +48,16 @@ export function App() {
         {tab === "find" && <FindPage onSave={handleSave} />}
         {tab === "library" && <LibraryPage library={library} onDelete={handleDelete} />}
         {tab === "finder" && <FinderPage onSave={handleSave} />}
+        {tab === "settings" && <SettingsPage />}
       </div>
+
+      {isPlaying && settings.loop && (
+        <div className="position-fixed bottom-0 start-50 translate-middle-x mb-3" style={{ zIndex: 1050 }}>
+          <button className="btn btn-danger rounded-pill shadow px-4" onClick={stop}>
+            ■ Stop
+          </button>
+        </div>
+      )}
     </>
   );
 }

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { generateVariations } from "../chord/variations";
 import { easiest } from "../chord/difficulty";
 import { ChordCard } from "./ChordCard";
-import { playVoicing } from "./audio";
+import { usePlayer } from "./PlayerContext";
 
 interface VariationView {
   symbol: string;
@@ -12,6 +12,7 @@ interface VariationView {
 }
 
 export function FindPage({ onSave }: { onSave: (symbol: string, frets: number[]) => void }) {
+  const { play } = usePlayer();
   const [input, setInput] = useState("");
   const [variations, setVariations] = useState<VariationView[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +61,7 @@ export function FindPage({ onSave }: { onSave: (symbol: string, frets: number[])
               <ChordCard symbol={v.symbol} frets={v.frets}>
                 <button
                   className="btn btn-sm btn-outline-secondary flex-fill"
-                  onClick={() => v.frets && playVoicing(v.frets)}
+                  onClick={() => v.frets && play(v.frets)}
                 >
                   ▶︎
                 </button>
