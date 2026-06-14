@@ -130,18 +130,26 @@ The chords *Dimas knows / wants*. The source of truth for what he plays.
   2. **root (or slash bass) is the lowest sounding string**;
   3. it has **≥4 sounding strings** (≤6). Doubling tones (e.g. an extra bass root) is
      allowed.
+  4. **playability:** an open string may not ring alongside notes high up the neck
+     (fretted note > fret 4). "open string + fret 9" shapes are unplayable, not real
+     voicings.
 - **Difficulty model — feature-based linear scorer, learnable.** Each voicing is
   described by features and scored as `score = weights · features`; **easiest =
-  lowest score**. Features (rough weight order):
-  1. **barre** required (one finger flattening a whole fret) — biggest penalty
-  2. **number of fretted notes** (open strings are free)
+  lowest score**. Cost is driven by **effective fingers**, where a **barre is one
+  finger** covering its fret. Features:
+  1. **effective fingers** — barre fret = 1 finger; only notes *above* the barre need
+     extra fingers; otherwise every fretted note is a finger (open strings are free)
+  2. **barre** surcharge (a barre is its own bit of effort, but modest)
   3. **fret span / stretch**
-  4. **inner muted strings** (skipping a middle string)
+  4. **inner muted strings** (light — muting a middle string is easy)
   5. **neck position** (lower/open slightly easier)
-  **Starting weights (seed; learning retunes them):** barre **+5**, per fretted note
-  **+1**, per fret of span **+1**, per inner muted string **+2**, per fret up the neck
-  (highest fret) **+0.2**. Sanity check: open D ≈ 4.6 pts, F barre ≈ 13.6 pts (F is
-  harder → higher). Easiest = lowest total.
+  A **compact barre** (≤3 notes after the barre, span ≤2 frets — e.g. F, barre-Bm
+  `x24432`) is **easy-medium**, not hard.
+  **Starting weights (seed; learning retunes them):** barre surcharge **+2**, per
+  effective finger **+1**, per fret of span **+1**, per inner muted string **+1**, per
+  fret up the neck (highest fret) **+0.2**. Sanity check: open D ≈ 4.6 pts, compact
+  barre (F / barre-Bm) ≈ 8.6 pts (easy-medium), inner-muted partial Bm `x B D x B F#`
+  ≈ 3.4. Easiest = lowest total.
   Defaults start as a **hand-tuned heuristic** (works day one). Later, a **pairwise
   preference page** ("which of these two voicings of the same chord is easier *for
   you*?") collects taps and refits the weights to Dimas's hands via a simple
@@ -173,8 +181,8 @@ The chords *Dimas knows / wants*. The source of truth for what he plays.
 Chord (parsed)        : { root, quality, extensions[], bass? }
 Chord (notes)         : { root, pitchClasses[] }              // from intervals
 Voicing               : { chord, frets[6], fingers[6], notes[], features }
-VoicingFeatures       : { hasBarre, frettedCount, fretSpan, innerMutes, position }
-DifficultyWeights     : { barre, frettedCount, fretSpan, innerMutes, position }
+VoicingFeatures       : { hasBarre, fingers, frettedCount, fretSpan, innerMutes, position }
+DifficultyWeights     : { barre, fingers, fretSpan, innerMutes, position }
 Preference            : { id, chord, voicingA, voicingB, winner, createdAt }  // P1.5
 LibraryEntry          : { id, symbol, parsedChord, chosenVoicing, createdAt }
 ```

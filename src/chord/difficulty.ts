@@ -12,25 +12,29 @@ import type { ParsedChord } from "./parser";
 
 export interface DifficultyWeights {
   barre: number;
-  frettedCount: number;
+  fingers: number;
   fretSpan: number;
   innerMutes: number;
   position: number;
 }
 
-/** SOT §7 starting weights: open D ≈ 4.6, F barre ≈ 13.6. */
+/**
+ * SOT §7 starting weights. Cost is driven by effective fingers (a barre is one
+ * finger), with only a moderate barre surcharge — so a compact barre (≤3 notes after
+ * the barre, ≤2-fret span) lands in "easy-medium": open D ≈ 4.6, barre-Bm/F ≈ 8.6.
+ */
 export const DEFAULT_WEIGHTS: DifficultyWeights = {
-  barre: 5,
-  frettedCount: 1,
+  barre: 2,
+  fingers: 1,
   fretSpan: 1,
-  innerMutes: 2,
+  innerMutes: 1, // muting a middle string is light effort
   position: 0.2,
 };
 
 export function score(features: VoicingFeatures, weights: DifficultyWeights = DEFAULT_WEIGHTS): number {
   return (
     weights.barre * (features.hasBarre ? 1 : 0) +
-    weights.frettedCount * features.frettedCount +
+    weights.fingers * features.fingers +
     weights.fretSpan * features.fretSpan +
     weights.innerMutes * features.innerMutes +
     weights.position * features.position

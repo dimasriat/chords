@@ -7,13 +7,14 @@ describe("score (SOT §7 starting weights)", () => {
     expect(score(computeFeatures([-1, -1, 0, 2, 3, 2]))).toBeCloseTo(4.6, 5);
   });
 
-  test("F barre ≈ 13.6 points", () => {
-    expect(score(computeFeatures([1, 3, 3, 2, 1, 1]))).toBeCloseTo(13.6, 5);
+  test("compact barre (F) is easy-medium ≈ 8.6 points", () => {
+    // barre(2) + fingers(4) + span(2) + position(0.6)
+    expect(score(computeFeatures([1, 3, 3, 2, 1, 1]))).toBeCloseTo(8.6, 5);
   });
 
   test("accepts custom weights", () => {
     const f = computeFeatures([-1, -1, 0, 2, 3, 2]);
-    expect(score(f, { ...DEFAULT_WEIGHTS, frettedCount: 0 })).toBeCloseTo(1.6, 5);
+    expect(score(f, { ...DEFAULT_WEIGHTS, fingers: 0 })).toBeCloseTo(1.6, 5);
   });
 });
 

@@ -6,15 +6,23 @@ const has = (frets: number[][], target: number[]) =>
   frets.some((f) => f.length === target.length && f.every((v, i) => v === target[i]));
 
 describe("computeFeatures", () => {
-  test("open D (xx0232): 3 fretted, span 1, no barre, no inner mutes", () => {
+  test("open D (xx0232): 3 fingers, span 1, no barre, no inner mutes", () => {
     const f = computeFeatures([-1, -1, 0, 2, 3, 2]);
-    expect(f).toEqual({ hasBarre: false, frettedCount: 3, fretSpan: 1, innerMutes: 0, position: 3 });
+    expect(f).toEqual({
+      hasBarre: false,
+      fingers: 3,
+      frettedCount: 3,
+      fretSpan: 1,
+      innerMutes: 0,
+      position: 3,
+    });
   });
 
-  test("F barre (133211): barre, 6 fretted, span 2", () => {
+  test("F barre (133211): barre = 1 finger + 3 above (4 effective), span 2", () => {
     const f = computeFeatures([1, 3, 3, 2, 1, 1]);
     expect(f.hasBarre).toBe(true);
     expect(f.frettedCount).toBe(6);
+    expect(f.fingers).toBe(4); // 1 barre + notes at frets 2,3,3
     expect(f.fretSpan).toBe(2);
     expect(f.position).toBe(3);
   });

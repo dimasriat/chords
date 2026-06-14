@@ -22,9 +22,13 @@ const MAX_SPAN = 4; // fretted notes fit within a 5-fret window
 const MIN_SOUNDING = 4;
 /** Above this many fretted notes a shape effectively requires a barre. */
 const BARRE_THRESHOLD = 4;
+/** Open strings can only ring alongside notes within this fret of the nut. */
+const OPEN_POSITION_MAX = 4;
 
 export interface VoicingFeatures {
   hasBarre: boolean;
+  /** Effort in fingers — a barre is one finger covering its fret. */
+  fingers: number;
   frettedCount: number;
   fretSpan: number;
   innerMutes: number;
@@ -50,6 +54,13 @@ export function computeFeatures(frets: number[]): VoicingFeatures {
   const frettedCount = fretted.length;
   const fretSpan = fretted.length > 1 ? Math.max(...fretted) - Math.min(...fretted) : 0;
   const position = fretted.length > 0 ? Math.max(...fretted) : 0;
+  const minFret = fretted.length > 0 ? Math.min(...fretted) : 0;
+
+  const hasBarre = frettedCount > BARRE_THRESHOLD;
+  // Effort in fingers: with a barre, the lowest fret is one finger and only the notes
+  // above it need extra fingers; otherwise every fretted note needs its own finger.
+  const notesAboveBarre = fretted.filter((f) => f > minFret).length;
+  const fingers = hasBarre ? 1 + notesAboveBarre : frettedCount;
 
   let innerMutes = 0;
   if (sounded.length > 0) {
@@ -60,13 +71,7 @@ export function computeFeatures(frets: number[]): VoicingFeatures {
     }
   }
 
-  return {
-    hasBarre: frettedCount > BARRE_THRESHOLD,
-    frettedCount,
-    fretSpan,
-    innerMutes,
-    position,
-  };
+  return { hasBarre, fingers, frettedCount, fretSpan, innerMutes, position };
 }
 
 export function isValidVoicing(frets: number[], tones: ChordTones): boolean {
@@ -79,6 +84,13 @@ export function isValidVoicing(frets: number[], tones: ChordTones): boolean {
   // Fretted notes must fit within the span window.
   const fretted = soundedIdx.filter(({ f }) => f > 0).map(({ f }) => f);
   if (fretted.length > 1 && Math.max(...fretted) - Math.min(...fretted) > MAX_SPAN) {
+    return false;
+  }
+
+  // Playability: an open string can't ring alongside notes high up the neck — those
+  // "open string + fret 9" combinations are unplayable, not real chord shapes.
+  const hasOpen = soundedIdx.some(({ f }) => f === 0);
+  if (hasOpen && fretted.length > 0 && Math.max(...fretted) > OPEN_POSITION_MAX) {
     return false;
   }
 
