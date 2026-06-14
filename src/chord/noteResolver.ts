@@ -6,6 +6,7 @@
  */
 
 import { OPEN_MIDI } from "./voicing";
+import { semitoneToNote } from "./notes";
 
 const MUTED = -1;
 
@@ -27,4 +28,9 @@ export function midiToFreq(midi: number): number {
 /** Voicing frets → sounded frequencies in Hz, low → high string. */
 export function resolveFrequencies(frets: number[]): number[] {
   return resolveMidi(frets).map(midiToFreq);
+}
+
+/** Voicing frets → sounded note names (e.g. ["D","A","D","F#"]), low → high string. */
+export function resolveNoteNames(frets: number[]): string[] {
+  return resolveMidi(frets).map((midi) => semitoneToNote(midi % 12));
 }

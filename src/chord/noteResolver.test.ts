@@ -1,5 +1,5 @@
 import { test, expect, describe } from "bun:test";
-import { resolveMidi, midiToFreq, resolveFrequencies } from "./noteResolver";
+import { resolveMidi, midiToFreq, resolveFrequencies, resolveNoteNames } from "./noteResolver";
 
 describe("resolveMidi", () => {
   test("open D (xx0232) → D3 A3 D4 F#4 MIDI pitches", () => {
@@ -26,6 +26,21 @@ describe("midiToFreq", () => {
 
   test("middle C (MIDI 60) ≈ 261.63 Hz", () => {
     expect(midiToFreq(60)).toBeCloseTo(261.6256, 3);
+  });
+});
+
+describe("resolveNoteNames", () => {
+  test("open D (xx0232) → D A D F#", () => {
+    expect(resolveNoteNames([-1, -1, 0, 2, 3, 2])).toEqual(["D", "A", "D", "F#"]);
+  });
+
+  test("open C (x32010) → C E G C E", () => {
+    expect(resolveNoteNames([-1, 3, 2, 0, 1, 0])).toEqual(["C", "E", "G", "C", "E"]);
+  });
+
+  test("skips muted strings", () => {
+    // D string open (D) + high e fret2 (F#)
+    expect(resolveNoteNames([-1, -1, 0, -1, -1, 2])).toEqual(["D", "F#"]);
   });
 });
 
