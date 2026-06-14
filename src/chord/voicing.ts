@@ -11,7 +11,7 @@ import { computeChordTones, type ChordTones } from "./chordTones";
 import type { ParsedChord } from "./parser";
 
 /** Standard tuning open-string MIDI pitches, low E (index 0) → high e (index 5). */
-const OPEN_MIDI = [40, 45, 50, 55, 59, 64];
+export const OPEN_MIDI = [40, 45, 50, 55, 59, 64];
 const STRINGS = OPEN_MIDI.length;
 
 /** A fret value: -1 = muted, 0 = open, n = fret n. */
