@@ -84,9 +84,10 @@ describe("generateVoicings", () => {
     expect(has(frets, [0, 2, 2, 0, 0, -1])).toBe(false); // subset 02200x removed
   });
 
-  test("keeps a subset that avoids a barre (top-4 F vs the full barre)", () => {
+  test("collapses subsets even of a barre — keep the fullest, play fewer strings", () => {
     const frets = generateVoicings("F").map((v) => v.frets);
-    expect(has(frets, [-1, -1, 3, 2, 1, 1])).toBe(true); // easy top-4 F survives
+    expect(has(frets, [1, 3, 3, 2, 1, 1])).toBe(true); // full barre F kept
+    expect(has(frets, [-1, -1, 3, 2, 1, 1])).toBe(false); // its top-4 subset removed
   });
 
   test("each voicing carries notes and features", () => {

@@ -172,17 +172,11 @@ export function generateVoicings(input: string | ParsedChord): Voicing[] {
 
   recurse(0);
 
-  // Drop voicings that are just a string-subset of a fuller one (same fingering, some
-  // strings muted) — UNLESS the subset avoids a barre the fuller shape needs (then
-  // it's a genuinely easier alternative, e.g. the top-4 "F" vs the full barre).
+  // Drop any voicing that is a strict string-subset of a fuller one (same frets, some
+  // strings muted) — keep only the fullest shape. To play an easier partial, just
+  // leave strings out of the fuller shape.
   return results.filter(
-    (v) =>
-      !results.some(
-        (w) =>
-          w !== v &&
-          isStringSubset(v.frets, w.frets) &&
-          !(w.features.hasBarre && !v.features.hasBarre),
-      ),
+    (v) => !results.some((w) => w !== v && isStringSubset(v.frets, w.frets)),
   );
 }
 
