@@ -153,3 +153,21 @@ bd close <id>         # Complete work
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
 <!-- END BEADS INTEGRATION -->
+
+## Development Workflow
+
+### Workflow Phases
+
+1. **Brainstorm → SOT**: Start every project/feature by deeply questioning requirements. Write the result as source-of-truth docs in `docs/`. SOT is the guardrail — all implementation must align with it.
+2. **SOT → Issues**: Break SOT into beads issues. Each issue references the relevant SOT section and has testable acceptance criteria.
+3. **Completion Check**: When a task is done, verify against SOT. Document any drift, decisions, or follow-up work as `--notes` on the beads issue.
+
+### Rules
+
+- **Every change gets an issue** — even small bugs. The goal is documenting decisions, not bureaucracy.
+- **Backend: TDD is mandatory** — write the test from the AC first → run the test suite and confirm it FAILS (red) → implement → run the test suite and confirm it PASSES (green). Never implement before the test exists.
+- **Frontend logic: TDD via shared modules** — pure functions (formatting, normalization, parsing, prompt building) must live in shared/service modules, not inside UI components. TDD these like backend code. Rule of thumb: if a function doesn't need the UI framework, `document`, or `window`, it belongs in a testable module.
+- **Frontend components: browser automation** — component lifecycle, rendering, and visual layout are verified via browser automation. No unit tests for components.
+- **SOT is authoritative** — if implementation differs from docs, the default is implementation adjusts. If docs need updating, document the decision in the issue notes.
+- **Issue notes replace PR reviews** — since work may be local-only, use `bd update <id> --notes` to record completion checks, drift analysis, and decisions.
+- **Commit after closing each issue** — every `bd close` must be immediately followed by a git commit. Do not batch multiple issues into one commit.
