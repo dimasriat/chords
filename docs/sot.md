@@ -261,3 +261,33 @@ device and ranked strongest-first (deduped, ~12 cap, only voiceable chords):
 
 Pure theory (`bridge.ts`, TDD). UI: a **Bridge** page — type from/to → ranked bridge
 cards (sequence diagrams + play the whole sequence). v1 inputs are typed chords.
+
+## 13. Chord naming conventions (the Finder / `chordNamer`)
+
+The Finder names a shape **from its notes alone, with no harmonic context**. That's
+why it can disagree with guitar chord sites (Google etc.) — they name by *function*.
+
+**Same notes, more than one valid name.** A note-set is often genuinely ambiguous.
+Example: `xx0220` = **D A C# E**:
+- **`Dmaj9` (no 3rd)** — the *functional / contextual* name. D is the intended root
+  (D in the bass), C# = maj7, E = 9; the major 3rd (F#) is **implied/omitted** (on
+  guitar the 3rd is the tone most often dropped from big chords, after the 5th). This
+  is what Google/chord sites usually print.
+- **`A/D`** — the *literal / spelling* name. `A C# E` is a complete A major triad, so
+  the app reads it as A major over a foreign D bass. This is what our namer prints.
+
+Neither is wrong; the ambiguity is what makes the chord sound open. We deliberately
+chose the **literal/spelling** convention. Its rules:
+
+1. **Most-complete-chord-first.** Find the fullest recognisable chord in the notes; a
+   bass note outside it becomes a slash (`A/D`).
+2. **Strict defining tones.** Won't print `maj9`/`9`/etc. unless the chord's defining
+   3rd (and 7th) are actually present — no "implied" tones.
+3. **Real inversions still slash normally.** A chord-tone bass → `C/E` (E is in C).
+4. **Added-tone chords (`add11`, `6/9`, …) are root-position only** — so the same
+   notes with the added tone in the bass stay a slash chord (`A/D`, not `Aadd11/D`).
+
+Trade-off: the literal convention is unambiguous and context-free, but won't match the
+"intended-root" labels guitarists expect (e.g. `Dmaj9` for the no-3rd shape). Switching
+to functional naming (recognise no-3rd extended chords by their root) is a future
+option; see `src/chord/chordNamer.ts`.
