@@ -27,7 +27,7 @@ export const DEFAULT_WEIGHTS: DifficultyWeights = {
   barre: 2,
   fingers: 1,
   fretSpan: 1,
-  innerMutes: 1, // muting a middle string is light effort
+  innerMutes: 3, // a muted inner string is hard to deaden cleanly while strumming
   position: 0.2,
 };
 

@@ -141,15 +141,17 @@ The chords *Dimas knows / wants*. The source of truth for what he plays.
      extra fingers; otherwise every fretted note is a finger (open strings are free)
   2. **barre** surcharge (a barre is its own bit of effort, but modest)
   3. **fret span / stretch**
-  4. **inner muted strings** (light — muting a middle string is easy)
+  4. **inner muted strings** — a *muted* middle string is hard to deaden cleanly
+     while strumming (an open string that just rings through is fine — only mutes count)
   5. **neck position** (lower/open slightly easier)
   A **compact barre** (≤3 notes after the barre, span ≤2 frets — e.g. F, barre-Bm
   `x24432`) is **easy-medium**, not hard.
   **Starting weights (seed; learning retunes them):** barre surcharge **+2**, per
-  effective finger **+1**, per fret of span **+1**, per inner muted string **+1**, per
-  fret up the neck (highest fret) **+0.2**. Sanity check: open D ≈ 4.6 pts, compact
-  barre (F / barre-Bm) ≈ 8.6 pts (easy-medium), inner-muted partial Bm `x B D x B F#`
-  ≈ 3.4. Easiest = lowest total.
+  effective finger **+1**, per fret of span **+1**, per inner muted string **+3**, per
+  fret up the neck (highest fret) **+0.2**. Sanity check: open D ≈ 4.6, compact barre
+  (F / barre-Bm `x24432`) ≈ 8.8 (easy-medium), easy partial Bm `x B D x B F#` ≈ 5.4,
+  and muting the middle (`x24x32` ≈ 9.8) is harder than barring through it
+  (`x24432` ≈ 8.8). Easiest = lowest total.
   Defaults start as a **hand-tuned heuristic** (works day one). Later, a **pairwise
   preference page** ("which of these two voicings of the same chord is easier *for
   you*?") collects taps and refits the weights to Dimas's hands via a simple

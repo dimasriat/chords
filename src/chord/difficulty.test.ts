@@ -16,6 +16,13 @@ describe("score (SOT §7 starting weights)", () => {
     const f = computeFeatures([-1, -1, 0, 2, 3, 2]);
     expect(score(f, { ...DEFAULT_WEIGHTS, fingers: 0 })).toBeCloseTo(1.6, 5);
   });
+
+  test("muting an inner string is harder than barring through it", () => {
+    // Bm: x24432 (barre, no hole) should beat x24x32 (G muted in the middle)
+    const barredThrough = score(computeFeatures([-1, 2, 4, 4, 3, 2]));
+    const mutedMiddle = score(computeFeatures([-1, 2, 4, -1, 3, 2]));
+    expect(barredThrough).toBeLessThan(mutedMiddle);
+  });
 });
 
 describe("compare", () => {
