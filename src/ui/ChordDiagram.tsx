@@ -50,9 +50,9 @@ export function ChordDiagram({ frets, fingers, size = 1, showNotes = true }: Cho
 
   return (
     <svg
-      width={width * size}
-      height={height * size}
+      width="100%"
       viewBox={`0 0 ${width} ${height}`}
+      style={{ maxWidth: width * size, height: "auto", display: "block", margin: "0 auto" }}
       role="img"
       aria-label="chord diagram"
     >
