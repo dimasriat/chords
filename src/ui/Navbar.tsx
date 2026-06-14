@@ -2,12 +2,13 @@
 
 import React from "react";
 
-export type Tab = "find" | "library" | "finder" | "settings";
+export type Tab = "find" | "library" | "finder" | "bridge" | "settings";
 
 const TABS: Array<{ id: Tab; label: string }> = [
   { id: "find", label: "Find" },
   { id: "library", label: "Library" },
   { id: "finder", label: "Finder" },
+  { id: "bridge", label: "Bridge" },
   { id: "settings", label: "⚙" },
 ];
 

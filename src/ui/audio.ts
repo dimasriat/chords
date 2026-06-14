@@ -91,3 +91,13 @@ export function playVoicing(frets: number[]): void {
   const ac = audioContext();
   pluckMidiAt(resolveMidi(frets), ac.currentTime + 0.02, { strum: true });
 }
+
+/** Strum a sequence of voicings in turn (for previewing a bridge/progression). */
+export function strumSequence(voicings: number[][], gap = 0.75): void {
+  const ac = audioContext();
+  let when = ac.currentTime + 0.05;
+  for (const frets of voicings) {
+    pluckMidiAt(resolveMidi(frets), when, { strum: true });
+    when += gap;
+  }
+}

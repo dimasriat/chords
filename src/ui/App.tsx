@@ -8,6 +8,7 @@ import { Navbar, type Tab } from "./Navbar";
 import { FindPage } from "./FindPage";
 import { LibraryPage } from "./LibraryPage";
 import { FinderPage } from "./FinderPage";
+import { BridgePage } from "./BridgePage";
 import { SettingsPage } from "./SettingsPage";
 import { ShapesPage } from "./ShapesPage";
 import { usePlayer } from "./PlayerContext";
@@ -61,6 +62,7 @@ export function App() {
               <LibraryPage library={library} onDelete={handleDelete} onShowShapes={setShapesFor} />
             )}
             {tab === "finder" && <FinderPage onSave={handleSave} />}
+            {tab === "bridge" && <BridgePage />}
             {tab === "settings" && <SettingsPage />}
           </>
         )}
