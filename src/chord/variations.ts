@@ -35,6 +35,7 @@ export function generateVariations(symbol: string): string[] {
     add(root); // base
     add(`${root}maj7`);
     add(`${root}7`);
+    add(`${root}9`); // dominant ninth
     add(`${root}6`);
     add(`${root}add9`);
     add(`${root}maj9`);

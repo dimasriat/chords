@@ -117,8 +117,8 @@ The chords *Dimas knows / wants*. The source of truth for what he plays.
   toward the span); search positions from the nut up to ~fret 12.
 - **Default variation set** (what the variation generator auto-offers; from standard
   practice, tunable later). Always include the base chord, plus:
-  - **major triad** → `maj7, 7, 6, add9, maj9, sus2, sus4` + slash `/3` (e.g. `C/E`),
-    `/5` (e.g. `C/G`)
+  - **major triad** → `maj7, 7, 9, 6, add9, maj9, sus2, sus4` + slash `/3` (e.g.
+    `C/E`), `/5` (e.g. `C/G`)
   - **minor triad** → `m7, m9, m6, madd9, sus2, sus4` + slash `/♭3` (e.g. `Am/C`),
     `/5` (e.g. `Am/E`)
   - **dominant 7** → `9, 13, 7sus4`

@@ -5,9 +5,13 @@ describe("generateVariations", () => {
   test("major triad: full default set (SOT §7)", () => {
     const v = generateVariations("C");
     expect(v).toContain("C"); // base always included
-    for (const s of ["Cmaj7", "C7", "C6", "Cadd9", "Cmaj9", "Csus2", "Csus4", "C/E", "C/G"]) {
+    for (const s of ["Cmaj7", "C7", "C9", "C6", "Cadd9", "Cmaj9", "Csus2", "Csus4", "C/E", "C/G"]) {
       expect(v).toContain(s);
     }
+  });
+
+  test("major triad offers the dominant 9 (e.g. A9)", () => {
+    expect(generateVariations("A")).toContain("A9");
   });
 
   test("minor triad: includes m7/m9/madd9 and slash forms", () => {
