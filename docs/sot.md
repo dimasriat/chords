@@ -248,3 +248,16 @@ Pattern  : { name, steps: Stroke[32] }
 Settings : { patternName, bpm, loop }          // localStorage
 NoteEvent: { time, midi[], mute }              // scheduler output
 ```
+
+## 12. Chord bridging
+
+Given two chords, generate **nice connecting sequences** `[from … to]`, named by their
+device and ranked strongest-first (deduped, ~12 cap, only voiceable chords):
+
+- **Secondary dominant** (V7 of target) — e.g. D→G ⇒ `D → D7 → G`
+- **ii–V of target** — `D → Am7 → D7 → G`
+- **Dominant 9**, **leading-tone dim7** (`F#dim7→G`), **suspension** (`Gsus4→G`),
+  **tritone sub** (`G#7→G`), **backdoor** (`F7→G`), **walking bass** (`D/F#`).
+
+Pure theory (`bridge.ts`, TDD). UI: a **Bridge** page — type from/to → ranked bridge
+cards (sequence diagrams + play the whole sequence). v1 inputs are typed chords.
