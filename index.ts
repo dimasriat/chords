@@ -54,7 +54,9 @@ const server = Bun.serve({
       },
     },
   },
-  development: { hmr: true, console: true },
+  // Dev features (HMR + the dev JSX runtime) only outside production; in production
+  // this keeps Bun on the stable `react/jsx-runtime` and avoids jsxDEV errors.
+  development: process.env.NODE_ENV !== "production" ? { hmr: true, console: true } : false,
 });
 
 console.log(`chords listening on ${server.url}`);
