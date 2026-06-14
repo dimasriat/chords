@@ -58,11 +58,15 @@ export function generateBridges(fromSym: string, toSym: string): Bridge[] {
   const seen = new Set<string>();
   const out: Bridge[] = [];
   for (const b of candidates) {
-    const key = b.sequence.join(">");
+    // Collapse consecutive duplicates so a connector that equals an endpoint (e.g.
+    // D9 → D9 → G9) doesn't survive; if nothing real is left, skip the bridge.
+    const sequence = b.sequence.filter((c, i) => i === 0 || c !== b.sequence[i - 1]);
+    if (sequence.length < 3) continue; // collapsed to just from → to: no connector
+    const key = sequence.join(">");
     if (seen.has(key)) continue;
-    if (!b.sequence.every(isVoiceable)) continue;
+    if (!sequence.every(isVoiceable)) continue;
     seen.add(key);
-    out.push(b);
+    out.push({ name: b.name, sequence });
     if (out.length >= MAX_BRIDGES) break;
   }
   return out;

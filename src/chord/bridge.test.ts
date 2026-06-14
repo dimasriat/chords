@@ -48,3 +48,21 @@ describe("generateBridges D → G", () => {
     expect(bridges[0]!.sequence).toContain("D7");
   });
 });
+
+describe("exotic / extended chords (D9 → G9)", () => {
+  const bridges = generateBridges("D9", "G9");
+
+  test("produces bridges for extended chords", () => {
+    expect(bridges.length).toBeGreaterThan(2);
+    expect(bridges.some((b) => b.sequence.includes("D7"))).toBe(true);
+  });
+
+  test("no no-op connector (e.g. D9 → D9 → G9 is dropped)", () => {
+    for (const b of bridges) {
+      expect(b.sequence.length).toBeGreaterThanOrEqual(3); // a real connector exists
+      for (let i = 1; i < b.sequence.length; i++) {
+        expect(b.sequence[i]).not.toBe(b.sequence[i - 1]); // no consecutive repeat
+      }
+    }
+  });
+});
