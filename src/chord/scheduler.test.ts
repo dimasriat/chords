@@ -1,5 +1,5 @@
 import { test, expect, describe } from "bun:test";
-import { buildSchedule, buildSequenceSchedule } from "./scheduler";
+import { buildSchedule, buildBridgeSchedule, bridgeSegmentLengths } from "./scheduler";
 import { parsePattern } from "./patterns";
 
 const OPEN_D = [-1, -1, 0, 2, 3, 2]; // bass = D string (midi 50); treble = 57,62,66
@@ -48,22 +48,34 @@ describe("buildSchedule", () => {
   });
 });
 
-describe("buildSequenceSchedule", () => {
+describe("bridgeSegmentLengths", () => {
+  test("D–D7–G → from ½, connector ½, target full", () => {
+    expect(bridgeSegmentLengths(3)).toEqual([16, 16, 32]);
+  });
+  test("D–Am7–D7–G → ½ · ¼ · ¼ · full", () => {
+    expect(bridgeSegmentLengths(4)).toEqual([16, 8, 8, 32]);
+  });
+  test("single chord → one full bar", () => {
+    expect(bridgeSegmentLengths(1)).toEqual([32]);
+  });
+});
+
+describe("buildBridgeSchedule", () => {
   const strum = parsePattern("a", "|A...|A...|A...|A...|A...|A...|A...|A...|");
 
-  test("spreads chords across the pattern — first half D, second half G", () => {
-    const { events } = buildSequenceSchedule(strum, [OPEN_D, OPEN_G], 120);
-    expect(events).toHaveLength(8); // one A per cell
-    // 2 chords over 32 steps → switch at step 16; A's fall on steps 0,4,8,12 | 16,20,24,28
+  test("each chord plays its segment, restarting the pattern from beat 1", () => {
+    // [D(16), G(16), D(32)] over an all-A pattern → A on every 4th step
+    const { events, duration } = buildBridgeSchedule(strum, [OPEN_D, OPEN_G, OPEN_D], 120);
+    // 4 (D, 16 steps) + 4 (G, 16 steps) + 8 (D, 32 steps) = 16 events
+    expect(events).toHaveLength(16);
+    expect(events[0]!.time).toBeCloseTo(0, 5); // D resets to beat 1
+    expect(events[4]!.time).toBeCloseTo(16 * (0.5 / 4), 5); // G starts a fresh bar at step 16
     expect(events[0]!.midi).toEqual([50, 57, 62, 66]); // D
     expect(events[4]!.midi).toEqual([43, 47, 50, 55, 59, 67]); // G
-  });
-
-  test("total duration is one pattern cycle regardless of chord count", () => {
-    expect(buildSequenceSchedule(strum, [OPEN_D, OPEN_G, OPEN_D], 120).duration).toBeCloseTo(4, 5);
+    expect(duration).toBeCloseTo(64 * (0.5 / 4), 5); // 2 bars total
   });
 
   test("empty sequence yields no events", () => {
-    expect(buildSequenceSchedule(strum, [], 120).events).toHaveLength(0);
+    expect(buildBridgeSchedule(strum, [], 120).events).toHaveLength(0);
   });
 });

@@ -5,7 +5,7 @@
  * prevents future cycles (notes already scheduled in the current cycle ring out).
  */
 
-import { buildSchedule, buildSequenceSchedule, type Schedule } from "../chord/scheduler";
+import { buildSchedule, buildBridgeSchedule, type Schedule } from "../chord/scheduler";
 import { presetByName } from "../chord/patterns";
 import { audioContext, pluckMidiAt, muteAt, stopAll } from "./audio";
 import type { Settings } from "./settings";
@@ -69,10 +69,10 @@ class PatternPlayer {
     this.playSchedule(buildSchedule(pattern, frets, settings.bpm), settings.loop);
   }
 
-  /** Play a sequence of chords spread across one pattern cycle (a bridge). */
+  /** Play a bridge: each chord plays the pattern from beat 1 for its segment. */
   playSequence(voicings: number[][], settings: Settings): void {
     const pattern = presetByName(settings.patternName);
-    this.playSchedule(buildSequenceSchedule(pattern, voicings, settings.bpm), settings.loop);
+    this.playSchedule(buildBridgeSchedule(pattern, voicings, settings.bpm), settings.loop);
   }
 
   stop(): void {

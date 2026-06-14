@@ -64,19 +64,39 @@ export function buildSchedule(pattern: Pattern, frets: number[], bpm: number): S
 }
 
 /**
- * Schedule a sequence of voicings across one pattern cycle — each chord gets a
- * contiguous chunk of the 32 steps (the bridge "grooves" in the pattern).
+ * Per-chord durations (in steps) for a bridge: the target (last) gets a full bar,
+ * the from-chord (first) gets a half bar, and the connectors split the other half.
+ * `D–D7–G` → [16, 16, 32]; `D–Am7–D7–G` → [16, 8, 8, 32].
  */
-export function buildSequenceSchedule(pattern: Pattern, voicings: number[][], bpm: number): Schedule {
-  const dt = stepSeconds(bpm);
-  const n = voicings.length;
-  const events: NoteEvent[] = [];
-  if (n === 0) return { events, duration: STEPS * dt };
+export function bridgeSegmentLengths(n: number): number[] {
+  if (n <= 0) return [];
+  if (n === 1) return [STEPS];
+  const half = STEPS / 2;
+  const connectors = n - 2;
+  const lengths = [half]; // from
+  for (let k = 0; k < connectors; k++) lengths.push(Math.round(half / connectors));
+  lengths.push(STEPS); // target
+  return lengths;
+}
 
-  pattern.steps.forEach((stroke, step) => {
-    const chordIdx = Math.min(Math.floor(step / (STEPS / n)), n - 1);
-    const ev = strokeMidi(voicings[chordIdx]!, stroke);
-    if (ev) events.push({ time: step * dt, ...ev });
+/**
+ * Schedule a bridge: each chord plays the pattern **from beat 1** for its allotted
+ * duration (target = full bar, from = ½ bar, connectors split the other ½). The
+ * pattern restarts on every chord change.
+ */
+export function buildBridgeSchedule(pattern: Pattern, voicings: number[][], bpm: number): Schedule {
+  const dt = stepSeconds(bpm);
+  const segments = bridgeSegmentLengths(voicings.length);
+
+  const events: NoteEvent[] = [];
+  let offset = 0;
+  voicings.forEach((frets, ci) => {
+    const len = segments[ci]!;
+    for (let s = 0; s < len; s++) {
+      const ev = strokeMidi(frets, pattern.steps[s]!); // s < STEPS → pattern from beat 1
+      if (ev) events.push({ time: (offset + s) * dt, ...ev });
+    }
+    offset += len;
   });
-  return { events, duration: STEPS * dt };
+  return { events, duration: offset * dt };
 }
