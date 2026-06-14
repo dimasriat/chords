@@ -207,6 +207,34 @@ defaults in Phase 1; refit from `Preference` rows in Phase 1.5.
 - **Phase 1.5** — Pairwise preference page: compare two voicings of the same chord,
   learn personal difficulty weights, refit the scorer to Dimas's hands. Includes a
   **reset** that clears preference data and reverts to default weights to relearn.
-- **Phase 2** — Board / pads built from the library, tap-to-play grid.
-- **Phase 3** — Transpose, key-family browser.
-- **Phase 4** — Memorization / practice.
+- **Phase 2** — **Pattern player** (fingerpicking / strumming). A global Settings
+  page sets the current **pattern** (preset), **tempo**, and **once/loop** mode; every
+  ▶︎ button plays its chord with that pattern. *(See `docs/phases/phase-2.md`.)*
+- **Phase 3** — Board / pads built from the library, tap-to-play grid.
+- **Phase 4** — Transpose, key-family browser.
+- **Phase 5** — Memorization / practice.
+
+## 11. Pattern player (Phase 2)
+
+Turn a static chord into a played groove. Tied to the bass/treble split of a voicing.
+
+- **Pattern** = 8 cells × 4 sub-steps = **32 steps** (fixed 8/8 for v1). Each step is a
+  **stroke**: `.` rest, `T` thumb→**bass string** (lowest sounded), `F` fingers→
+  **treble strings** (the rest), `A` all (strum every sounded string), `X` mute/damp.
+- Written compactly as `|A...|A...|...` (pipes delimit cells); parsed to a stroke array.
+- **Presets only** for v1 (e.g. `p1` straight strum, `p2` thumb–fingers alternating,
+  `p3` Travis-style). Custom grid editing is later.
+- **Settings (global):** current pattern, **tempo (BPM)**, **mode** (play once | loop).
+  Persisted client-side (localStorage). Every ▶︎ button uses these.
+- **Loop mode** shows a **Stop** control; once mode plays through and stops.
+- **Scheduler** (pure, testable): `pattern + voicing + bpm → timed note events`
+  (`{ time, midi[], mute }`); step = a 16th note = `(60/bpm)/4` s. A **Web Audio
+  lookahead sequencer** plays the schedule.
+
+Data model additions:
+```
+Stroke   : "." | "T" | "F" | "A" | "X"
+Pattern  : { name, steps: Stroke[32] }
+Settings : { patternName, bpm, loop }          // localStorage
+NoteEvent: { time, midi[], mute }              // scheduler output
+```
