@@ -8,6 +8,7 @@ interface PlayerContextValue {
   settings: Settings;
   setSettings: (s: Settings) => void;
   play: (frets: number[]) => void;
+  playSequence: (voicings: number[][]) => void;
   stop: () => void;
   isPlaying: boolean;
 }
@@ -29,6 +30,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     settings,
     setSettings,
     play: (frets) => player.play(frets, settings),
+    playSequence: (voicings) => player.playSequence(voicings, settings),
     stop: () => player.stop(),
     isPlaying,
   };

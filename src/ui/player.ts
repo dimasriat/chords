@@ -5,7 +5,7 @@
  * prevents future cycles (notes already scheduled in the current cycle ring out).
  */
 
-import { buildSchedule, type Schedule } from "../chord/scheduler";
+import { buildSchedule, buildSequenceSchedule, type Schedule } from "../chord/scheduler";
 import { presetByName } from "../chord/patterns";
 import { audioContext, pluckMidiAt, muteAt, stopAll } from "./audio";
 import type { Settings } from "./settings";
@@ -41,14 +41,12 @@ class PatternPlayer {
     }
   }
 
-  play(frets: number[], settings: Settings): void {
+  private playSchedule(schedule: Schedule, loop: boolean): void {
     this.stop();
-    const ac = audioContext();
-    const pattern = presetByName(settings.patternName);
-    const schedule = buildSchedule(pattern, frets, settings.bpm);
     if (schedule.events.length === 0) return;
+    const ac = audioContext();
 
-    if (!settings.loop) {
+    if (!loop) {
       this.scheduleCycle(ac.currentTime + 0.05, schedule);
       this.setPlaying(true);
       this.timer = setTimeout(() => this.setPlaying(false), (schedule.duration + 0.4) * 1000);
@@ -57,12 +55,24 @@ class PatternPlayer {
 
     this.setPlaying(true);
     let cycleStart = ac.currentTime + 0.05;
-    const loop = () => {
+    const loopCycle = () => {
       this.scheduleCycle(cycleStart, schedule);
       cycleStart += schedule.duration;
-      this.timer = setTimeout(loop, schedule.duration * 1000 - LOOKAHEAD_MS);
+      this.timer = setTimeout(loopCycle, schedule.duration * 1000 - LOOKAHEAD_MS);
     };
-    loop();
+    loopCycle();
+  }
+
+  /** Play a single chord with the current pattern. */
+  play(frets: number[], settings: Settings): void {
+    const pattern = presetByName(settings.patternName);
+    this.playSchedule(buildSchedule(pattern, frets, settings.bpm), settings.loop);
+  }
+
+  /** Play a sequence of chords spread across one pattern cycle (a bridge). */
+  playSequence(voicings: number[][], settings: Settings): void {
+    const pattern = presetByName(settings.patternName);
+    this.playSchedule(buildSequenceSchedule(pattern, voicings, settings.bpm), settings.loop);
   }
 
   stop(): void {
