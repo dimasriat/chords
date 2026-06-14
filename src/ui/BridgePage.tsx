@@ -22,11 +22,11 @@ function BridgeCard({ bridge }: { bridge: Bridge }) {
     setPicks((prev) => {
       const next = [...prev];
       const count = options[i]!.length || 1;
-      next[i] = (prev[i]! + 1) % count;
+      next[i] = ((prev[i] ?? 0) + 1) % count;
       return next;
     });
 
-  const chosen = (i: number): number[] | null => options[i]![picks[i]!] ?? null;
+  const chosen = (i: number): number[] | null => options[i]![picks[i] ?? 0] ?? null;
 
   function play() {
     const voicings = bridge.sequence
@@ -62,7 +62,7 @@ function BridgeCard({ bridge }: { bridge: Bridge }) {
                 )}
                 {options[i]!.length > 1 && (
                   <div className="text-muted" style={{ fontSize: 10 }}>
-                    {picks[i]! + 1}/{options[i]!.length}
+                    {(picks[i] ?? 0) + 1}/{options[i]!.length}
                   </div>
                 )}
               </div>
@@ -129,8 +129,8 @@ export function BridgePage() {
       {bridges && bridges.length === 0 && (
         <p className="text-muted">No bridges found for those chords.</p>
       )}
-      {bridges?.map((b, i) => (
-        <BridgeCard key={i} bridge={b} />
+      {bridges?.map((b) => (
+        <BridgeCard key={b.sequence.join(">")} bridge={b} />
       ))}
     </div>
   );
