@@ -22,3 +22,4 @@
 {"id":"int-80a7e468","kind":"field_change","created_at":"2026-06-14T09:37:24.723756541Z","actor":"Dimas","issue_id":"chords-03h","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
 {"id":"int-a1fa32f9","kind":"field_change","created_at":"2026-06-14T09:37:29.506178441Z","actor":"Dimas","issue_id":"chords-t6u","extra":{"field":"status","new_value":"closed","old_value":"open","reason":"Closed"}}
 {"id":"int-45c58009","kind":"field_change","created_at":"2026-06-14T09:37:34.750519876Z","actor":"Dimas","issue_id":"chords-8pc","extra":{"field":"status","new_value":"closed","old_value":"open","reason":"Closed"}}
+{"id":"int-785e5b69","kind":"field_change","created_at":"2026-06-14T09:42:16.229629804Z","actor":"Dimas","issue_id":"chords-csy","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
