@@ -46,8 +46,14 @@ function intervalSet(parsed: ParsedChord): {
   for (const ext of parsed.extensions) {
     switch (ext) {
       case "7":
-        intervals.add(10);
-        seventh = 10;
+        if (parsed.quality === "dim") {
+          // Fully-diminished 7th (bb7), not a m7b5.
+          intervals.add(9);
+          seventh = 9;
+        } else {
+          intervals.add(10);
+          seventh = 10;
+        }
         break;
       case "maj7":
         intervals.add(11);
@@ -115,7 +121,9 @@ export function computeChordTones(input: string | ParsedChord): ChordTones {
   // Essential tones: root + third always; fifth only on a plain triad; the 7th and
   // a named 9th are essential when present (SOT §7 voicing validity rule).
   const essentialIntervals = new Set<number>([0, third]);
-  if (!hasExtension) essentialIntervals.add(fifth);
+  // The 5th is droppable on extended chords — except diminished, whose b5 is a
+  // defining tone (dim/dim7 are stacks of minor thirds).
+  if (!hasExtension || parsed.quality === "dim") essentialIntervals.add(fifth);
   if (seventh !== null) essentialIntervals.add(seventh);
   if (hasNamedNinth) essentialIntervals.add(2);
 

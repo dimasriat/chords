@@ -34,6 +34,12 @@ describe("computeChordTones", () => {
     expect(ess("Bm9")).toEqual([1, 2, 9, 11]); // root B, b3 D, b7 A, 9 C# (5th F# optional)
   });
 
+  test("dim7 is fully diminished (bb7): F#dim7 → F# A C Eb", () => {
+    // F#=6, A=9, C=0, Eb=3
+    expect(pcs("F#dim7")).toEqual([0, 3, 6, 9]);
+    expect(ess("F#dim7")).toEqual([0, 3, 6, 9]);
+  });
+
   test("Csus4 → C F G", () => {
     expect(pcs("Csus4")).toEqual([0, 5, 7]);
     expect(ess("Csus4")).toEqual([0, 5, 7]);
