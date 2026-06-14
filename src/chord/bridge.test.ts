@@ -1,0 +1,50 @@
+import { test, expect, describe } from "bun:test";
+import { generateBridges } from "./bridge";
+import { parseChord } from "./parser";
+
+describe("generateBridges D → G", () => {
+  const bridges = generateBridges("D", "G");
+
+  test("returns several ranked bridges, capped", () => {
+    expect(bridges.length).toBeGreaterThan(3);
+    expect(bridges.length).toBeLessThanOrEqual(12);
+  });
+
+  test("every sequence starts with the from-chord and ends with the to-chord", () => {
+    for (const b of bridges) {
+      expect(b.sequence[0]).toBe("D");
+      expect(b.sequence[b.sequence.length - 1]).toBe("G");
+    }
+  });
+
+  test("includes the secondary dominant D7 (the canonical D→G bridge)", () => {
+    expect(bridges.some((b) => b.sequence.includes("D7"))).toBe(true);
+  });
+
+  test("includes a ii–V (Am7 then D7)", () => {
+    expect(
+      bridges.some((b) => b.sequence.includes("Am7") && b.sequence.includes("D7")),
+    ).toBe(true);
+  });
+
+  test("includes the leading-tone diminished F#dim7", () => {
+    expect(bridges.some((b) => b.sequence.includes("F#dim7"))).toBe(true);
+  });
+
+  test("every chord in every bridge is parseable/voiceable", () => {
+    for (const b of bridges) {
+      for (const sym of b.sequence) {
+        expect(() => parseChord(sym)).not.toThrow();
+      }
+    }
+  });
+
+  test("no duplicate sequences", () => {
+    const keys = bridges.map((b) => b.sequence.join(">"));
+    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  test("secondary dominant ranks first (strongest)", () => {
+    expect(bridges[0]!.sequence).toContain("D7");
+  });
+});
