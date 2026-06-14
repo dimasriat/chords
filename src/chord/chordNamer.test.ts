@@ -69,4 +69,21 @@ describe("nameChord", () => {
   test("a true chord-tone bass still names as a normal inversion, not a slash-of-upper", () => {
     expect(nameChord([0, 4, 7], 4)).toBe("C/E"); // E is in C major → C/E, unchanged
   });
+
+  // Added-tone chords, recognised only in root position.
+  test("major add11 in root position: A C# E + D bass=A → Aadd11", () => {
+    expect(nameChord([9, 1, 4, 2], 9)).toBe("Aadd11"); // A=root, C#, E, D(11)
+  });
+
+  test("6/9 in root position: C E G A D → C6/9", () => {
+    expect(nameChord([0, 4, 7, 9, 2], 0)).toBe("C6/9");
+  });
+
+  test("minor add11 in root position → Cmadd11", () => {
+    expect(nameChord([0, 3, 5, 7], 0)).toBe("Cmadd11");
+  });
+
+  test("the same notes with the 4th in the bass stay a slash chord (A/D, not Aadd11/D)", () => {
+    expect(nameChord([2, 9, 1, 4], 2)).toBe("A/D"); // added-tone is root-position only
+  });
 });

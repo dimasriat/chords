@@ -9,8 +9,12 @@
 
 import { semitoneToNote } from "./notes";
 
-/** Interval-set (sorted, from root) → chord suffix. Includes no-5th variants. */
-const FORMULAS: Array<{ intervals: number[]; suffix: string }> = [
+/**
+ * Interval-set (sorted, from root) → chord suffix. Includes no-5th variants.
+ * `rootOnly` formulas (added-tone chords) are recognised only when the bass is the
+ * root — so an inversion like "A C# E over D" stays the slash chord A/D, not Aadd11/D.
+ */
+const FORMULAS: Array<{ intervals: number[]; suffix: string; rootOnly?: boolean }> = [
   // dyad
   { intervals: [0, 7], suffix: "5" },
   // triads
@@ -44,9 +48,17 @@ const FORMULAS: Array<{ intervals: number[]; suffix: string }> = [
   { intervals: [0, 2, 4, 10], suffix: "9" },
   { intervals: [0, 2, 3, 7, 10], suffix: "m9" },
   { intervals: [0, 2, 3, 10], suffix: "m9" },
+  // added-tone chords — root position only (see `rootOnly` above)
+  { intervals: [0, 4, 5, 7], suffix: "add11", rootOnly: true }, // major add 4/11
+  { intervals: [0, 3, 5, 7], suffix: "madd11", rootOnly: true }, // minor add 4/11
+  { intervals: [0, 2, 4, 7, 9], suffix: "6/9", rootOnly: true }, // major 6/9
+  { intervals: [0, 2, 4, 9], suffix: "6/9", rootOnly: true }, // 6/9 without the 5th
+  { intervals: [0, 2, 3, 7, 9], suffix: "m6/9", rootOnly: true }, // minor 6/9
 ];
 
-const FORMULA_BY_KEY = new Map(FORMULAS.map((f) => [f.intervals.join(","), f.suffix]));
+const FORMULA_BY_KEY = new Map(
+  FORMULAS.map((f) => [f.intervals.join(","), { suffix: f.suffix, rootOnly: f.rootOnly ?? false }]),
+);
 
 const key = (pcs: number[], root: number) =>
   [...new Set(pcs.map((p) => ((p - root) % 12 + 12) % 12))].sort((a, b) => a - b).join(",");
@@ -65,9 +77,10 @@ export function nameChord(pitchClasses: number[], bassPc: number): string | null
   const roots = [bass, ...unique.filter((p) => p !== bass)];
 
   for (const root of roots) {
-    const suffix = FORMULA_BY_KEY.get(key(unique, root));
-    if (suffix === undefined) continue;
-    const name = semitoneToNote(root) + suffix;
+    const f = FORMULA_BY_KEY.get(key(unique, root));
+    if (!f) continue;
+    if (f.rootOnly && root !== bass) continue; // added-tone chords name in root position only
+    const name = semitoneToNote(root) + f.suffix;
     return root === bass ? name : `${name}/${semitoneToNote(bass)}`;
   }
 
@@ -76,9 +89,9 @@ export function nameChord(pitchClasses: number[], bassPc: number): string | null
   const upper = unique.filter((p) => p !== bass);
   if (upper.length >= 2) {
     for (const root of upper) {
-      const suffix = FORMULA_BY_KEY.get(key(upper, root));
-      if (suffix !== undefined) {
-        return `${semitoneToNote(root)}${suffix}/${semitoneToNote(bass)}`;
+      const f = FORMULA_BY_KEY.get(key(upper, root));
+      if (f && !f.rootOnly) {
+        return `${semitoneToNote(root)}${f.suffix}/${semitoneToNote(bass)}`;
       }
     }
   }
