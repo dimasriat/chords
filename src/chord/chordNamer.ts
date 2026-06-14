@@ -70,5 +70,17 @@ export function nameChord(pitchClasses: number[], bassPc: number): string | null
     const name = semitoneToNote(root) + suffix;
     return root === bass ? name : `${name}/${semitoneToNote(bass)}`;
   }
+
+  // Foreign-bass slash chord: the bass isn't a chord tone, but the notes above it
+  // form a known chord (e.g. A major over a D bass → A/D).
+  const upper = unique.filter((p) => p !== bass);
+  if (upper.length >= 2) {
+    for (const root of upper) {
+      const suffix = FORMULA_BY_KEY.get(key(upper, root));
+      if (suffix !== undefined) {
+        return `${semitoneToNote(root)}${suffix}/${semitoneToNote(bass)}`;
+      }
+    }
+  }
   return null;
 }

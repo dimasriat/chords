@@ -54,4 +54,19 @@ describe("nameChord", () => {
     expect(fromFrets([-1, -1, 0, 2, 3, 2])).toBe("D");
     expect(fromFrets([-1, 3, 2, 0, 1, 0])).toBe("C");
   });
+
+  // Slash chords whose bass is NOT a chord tone: name the chord above the bass.
+  test("A major over a D bass → A/D (xx0220)", () => {
+    // D A C# E, bass D — D is the 4th of A, so the whole set isn't one chord
+    expect(nameChord([2, 9, 1, 4], 2)).toBe("A/D");
+    expect(fromFrets([-1, -1, 0, 2, 2, 0])).toBe("A/D");
+  });
+
+  test("G major over a C bass → G/C", () => {
+    expect(nameChord([7, 11, 2, 0], 0)).toBe("G/C");
+  });
+
+  test("a true chord-tone bass still names as a normal inversion, not a slash-of-upper", () => {
+    expect(nameChord([0, 4, 7], 4)).toBe("C/E"); // E is in C major → C/E, unchanged
+  });
 });
