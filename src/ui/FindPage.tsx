@@ -11,7 +11,12 @@ interface VariationView {
   frets: number[] | null;
 }
 
-export function FindPage({ onSave }: { onSave: (symbol: string, frets: number[]) => void }) {
+interface FindPageProps {
+  onSave: (symbol: string, frets: number[]) => void;
+  onShowShapes: (symbol: string) => void;
+}
+
+export function FindPage({ onSave, onShowShapes }: FindPageProps) {
   const { play } = usePlayer();
   const [input, setInput] = useState("");
   const [variations, setVariations] = useState<VariationView[]>([]);
@@ -70,6 +75,13 @@ export function FindPage({ onSave }: { onSave: (symbol: string, frets: number[])
                   onClick={() => v.frets && onSave(v.symbol, v.frets)}
                 >
                   ＋
+                </button>
+                <button
+                  className="btn btn-sm btn-outline-secondary flex-fill"
+                  title="All shapes of this chord"
+                  onClick={() => onShowShapes(v.symbol)}
+                >
+                  🔄
                 </button>
               </ChordCard>
             </div>

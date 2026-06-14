@@ -9,14 +9,21 @@ import { FindPage } from "./FindPage";
 import { LibraryPage } from "./LibraryPage";
 import { FinderPage } from "./FinderPage";
 import { SettingsPage } from "./SettingsPage";
+import { ShapesPage } from "./ShapesPage";
 import { usePlayer } from "./PlayerContext";
 import { fetchLibrary, saveChord, removeChord, type LibraryEntry } from "./api";
 
 export function App() {
   const [tab, setTab] = useState<Tab>("find");
+  const [shapesFor, setShapesFor] = useState<string | null>(null);
   const [library, setLibrary] = useState<LibraryEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
   const { isPlaying, stop, settings } = usePlayer();
+
+  function goToTab(t: Tab) {
+    setShapesFor(null);
+    setTab(t);
+  }
 
   useEffect(() => {
     fetchLibrary().then(setLibrary).catch(() => setError("Couldn't load your library."));
@@ -42,13 +49,21 @@ export function App() {
 
   return (
     <>
-      <Navbar tab={tab} setTab={setTab} />
+      <Navbar tab={tab} setTab={goToTab} />
       <div className="container py-3" style={{ maxWidth: 560 }}>
         {error && <div className="alert alert-warning py-2">{error}</div>}
-        {tab === "find" && <FindPage onSave={handleSave} />}
-        {tab === "library" && <LibraryPage library={library} onDelete={handleDelete} />}
-        {tab === "finder" && <FinderPage onSave={handleSave} />}
-        {tab === "settings" && <SettingsPage />}
+        {shapesFor ? (
+          <ShapesPage symbol={shapesFor} onBack={() => setShapesFor(null)} onSave={handleSave} />
+        ) : (
+          <>
+            {tab === "find" && <FindPage onSave={handleSave} onShowShapes={setShapesFor} />}
+            {tab === "library" && (
+              <LibraryPage library={library} onDelete={handleDelete} onShowShapes={setShapesFor} />
+            )}
+            {tab === "finder" && <FinderPage onSave={handleSave} />}
+            {tab === "settings" && <SettingsPage />}
+          </>
+        )}
       </div>
 
       {isPlaying && settings.loop && (

@@ -8,9 +8,10 @@ import type { LibraryEntry } from "./api";
 interface LibraryPageProps {
   library: LibraryEntry[];
   onDelete: (id: number) => void;
+  onShowShapes: (symbol: string) => void;
 }
 
-export function LibraryPage({ library, onDelete }: LibraryPageProps) {
+export function LibraryPage({ library, onDelete, onShowShapes }: LibraryPageProps) {
   const { play } = usePlayer();
   if (library.length === 0) {
     return <p className="text-muted">No saved chords yet — add some from Find or Chord Finder.</p>;
@@ -25,6 +26,13 @@ export function LibraryPage({ library, onDelete }: LibraryPageProps) {
               onClick={() => play(e.voicing)}
             >
               ▶︎
+            </button>
+            <button
+              className="btn btn-sm btn-outline-secondary flex-fill"
+              title="All shapes of this chord"
+              onClick={() => onShowShapes(e.symbol)}
+            >
+              🔄
             </button>
             <button
               className="btn btn-sm btn-outline-danger flex-fill"
