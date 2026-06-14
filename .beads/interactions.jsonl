@@ -3,3 +3,8 @@
 {"id":"int-c350d087","kind":"field_change","created_at":"2026-06-14T08:29:10.027506971Z","actor":"Dimas","issue_id":"chords-tc1","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
 {"id":"int-998eae7f","kind":"field_change","created_at":"2026-06-14T08:30:27.072582287Z","actor":"Dimas","issue_id":"chords-6j9","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
 {"id":"int-f139d3f4","kind":"field_change","created_at":"2026-06-14T08:31:43.429053433Z","actor":"Dimas","issue_id":"chords-bds","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
+{"id":"int-d5fa81af","kind":"field_change","created_at":"2026-06-14T08:33:54.044761443Z","actor":"Dimas","issue_id":"chords-s88","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
+{"id":"int-189dd8e1","kind":"field_change","created_at":"2026-06-14T08:40:54.651964365Z","actor":"Dimas","issue_id":"chords-huv","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
+{"id":"int-342166ec","kind":"field_change","created_at":"2026-06-14T08:40:59.814471765Z","actor":"Dimas","issue_id":"chords-l2k","extra":{"field":"status","new_value":"closed","old_value":"open","reason":"Closed"}}
+{"id":"int-0ba9498a","kind":"field_change","created_at":"2026-06-14T08:41:04.979248531Z","actor":"Dimas","issue_id":"chords-7d2","extra":{"field":"status","new_value":"closed","old_value":"open","reason":"Closed"}}
+{"id":"int-4dba67ef","kind":"field_change","created_at":"2026-06-14T08:41:09.625333118Z","actor":"Dimas","issue_id":"chords-3mb","extra":{"field":"status","new_value":"closed","old_value":"open","reason":"Closed"}}
