@@ -70,7 +70,6 @@ export function BridgePage() {
           <span className="input-group-text">from</span>
           <input
             className="form-control"
-            placeholder="D"
             value={from}
             onChange={(e) => setFrom(e.target.value)}
             autoCapitalize="off"
@@ -80,7 +79,6 @@ export function BridgePage() {
           <span className="input-group-text">to</span>
           <input
             className="form-control"
-            placeholder="G"
             value={to}
             onChange={(e) => setTo(e.target.value)}
             autoCapitalize="off"
