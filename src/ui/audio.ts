@@ -10,6 +10,8 @@ import { resolveMidi, midiToFreq } from "../chord/noteResolver";
 
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
+/** Every scheduled oscillator, so Stop can cut them immediately. */
+const activeOscs = new Set<OscillatorNode>();
 
 export function audioContext(): AudioContext {
   if (!ctx) {
@@ -42,6 +44,29 @@ function pluckOne(ac: AudioContext, freq: number, when: number): void {
   osc.connect(lp).connect(gain).connect(master!);
   osc.start(when);
   osc.stop(when + duration + 0.05);
+
+  activeOscs.add(osc);
+  osc.onended = () => activeOscs.delete(osc);
+}
+
+/** Immediately stop everything that's sounding or scheduled (for Stop). */
+export function stopAll(): void {
+  if (!ctx || !master) return;
+  const now = ctx.currentTime;
+  // Briefly duck the master to avoid a click, then restore it for next playback.
+  master.gain.cancelScheduledValues(now);
+  master.gain.setValueAtTime(master.gain.value, now);
+  master.gain.linearRampToValueAtTime(0, now + 0.03);
+  master.gain.setValueAtTime(1, now + 0.06);
+  // Stop sounding notes AND notes scheduled later this cycle that haven't started.
+  for (const osc of activeOscs) {
+    try {
+      osc.stop(now + 0.04);
+    } catch {
+      // already stopped
+    }
+  }
+  activeOscs.clear();
 }
 
 /** Pluck a set of MIDI notes at an absolute AudioContext time (optionally strummed). */

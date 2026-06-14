@@ -7,7 +7,7 @@
 
 import { buildSchedule, type Schedule } from "../chord/scheduler";
 import { presetByName } from "../chord/patterns";
-import { audioContext, pluckMidiAt, muteAt } from "./audio";
+import { audioContext, pluckMidiAt, muteAt, stopAll } from "./audio";
 import type { Settings } from "./settings";
 
 type StateListener = (playing: boolean) => void;
@@ -70,6 +70,7 @@ class PatternPlayer {
       clearTimeout(this.timer);
       this.timer = null;
     }
+    stopAll();
     this.setPlaying(false);
   }
 }
