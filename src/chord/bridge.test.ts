@@ -54,7 +54,7 @@ describe("exotic / extended chords (D9 → G9)", () => {
 
   test("produces bridges for extended chords", () => {
     expect(bridges.length).toBeGreaterThan(2);
-    expect(bridges.some((b) => b.sequence.includes("D7"))).toBe(true);
+    expect(bridges.some((b) => b.sequence.includes("D9"))).toBe(true);
   });
 
   test("no no-op connector (e.g. D9 → D9 → G9 is dropped)", () => {
@@ -64,5 +64,20 @@ describe("exotic / extended chords (D9 → G9)", () => {
         expect(b.sequence[i]).not.toBe(b.sequence[i - 1]); // no consecutive repeat
       }
     }
+  });
+
+  test("connectors inherit the extension level (lush in, lush out)", () => {
+    // secondary dominant is D9 (not plain D7), ii is Am9 (not Am7)
+    expect(bridges.some((b) => b.sequence.includes("D9"))).toBe(true);
+    expect(bridges.some((b) => b.sequence.includes("Am9") && b.sequence.includes("D9"))).toBe(true);
+    expect(bridges.some((b) => b.sequence.includes("D7"))).toBe(false);
+  });
+});
+
+describe("plain inputs stay plain (no regression)", () => {
+  test("D → G connectors are 7ths, not 9ths", () => {
+    const bridges = generateBridges("D", "G");
+    expect(bridges.some((b) => b.sequence.includes("D7"))).toBe(true);
+    expect(bridges.some((b) => b.sequence.includes("Am7") && b.sequence.includes("D7"))).toBe(true);
   });
 });
