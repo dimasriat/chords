@@ -46,18 +46,28 @@ export function compare(a: Voicing, b: Voicing, weights: DifficultyWeights = DEF
   return score(a.features, weights) - score(b.features, weights);
 }
 
+export interface VoicingFilter {
+  /** Exclude "open" voicings that leave out the chord's 3rd. */
+  hideOpen?: boolean;
+}
+
 /** The k easiest valid voicings for a chord, easiest first. */
 export function topK(
   input: string | ParsedChord,
   k: number,
   weights: DifficultyWeights = DEFAULT_WEIGHTS,
+  filter: VoicingFilter = {},
 ): Voicing[] {
-  return generateVoicings(input)
-    .sort((a, b) => compare(a, b, weights))
-    .slice(0, k);
+  let voicings = generateVoicings(input);
+  if (filter.hideOpen) voicings = voicings.filter((v) => !v.omitsThird);
+  return voicings.sort((a, b) => compare(a, b, weights)).slice(0, k);
 }
 
 /** The single easiest valid voicing, or undefined if none exist. */
-export function easiest(input: string | ParsedChord, weights: DifficultyWeights = DEFAULT_WEIGHTS): Voicing | undefined {
-  return topK(input, 1, weights)[0];
+export function easiest(
+  input: string | ParsedChord,
+  weights: DifficultyWeights = DEFAULT_WEIGHTS,
+  filter: VoicingFilter = {},
+): Voicing | undefined {
+  return topK(input, 1, weights, filter)[0];
 }

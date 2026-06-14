@@ -31,7 +31,21 @@ describe("computeChordTones", () => {
   test("Bm9 → minor triad + b7 + 9, those defining tones essential", () => {
     // B=11, D=2, F#=6, A=9, C#=1
     expect(pcs("Bm9")).toEqual([1, 2, 6, 9, 11]);
-    expect(ess("Bm9")).toEqual([1, 2, 9, 11]); // root B, b3 D, b7 A, 9 C# (5th F# optional)
+    // 9th chord → 3rd optional too; essential = root B, b7 A, 9 C# (3rd & 5th droppable)
+    expect(ess("Bm9")).toEqual([1, 9, 11]);
+  });
+
+  test("Dmaj9: 3rd optional (lush 'no 3rd' voicings allowed)", () => {
+    // D F# A C# E
+    expect(pcs("Dmaj9")).toEqual([1, 2, 4, 6, 9]);
+    // essential = root D, maj7 C#, 9 E — NOT the 3rd F# (so xx0220 is valid)
+    expect(ess("Dmaj9")).toEqual([1, 2, 4]);
+    expect(computeChordTones("Dmaj9").thirdPc).toBe(6); // F#
+  });
+
+  test("plain triad still requires its 3rd; add9 (no 7th) keeps the 3rd", () => {
+    expect(ess("D")).toContain(6); // F# required for D major
+    expect(ess("Dadd9")).toContain(6); // add9 has no 7th → 3rd stays essential
   });
 
   test("dim7 is fully diminished (bb7): F#dim7 → F# A C Eb", () => {

@@ -66,6 +66,21 @@ export function SettingsPage() {
         </button>
       </div>
 
+      <h2 className="h6 text-muted">Voicings</h2>
+      <div className="form-check form-switch mb-3">
+        <input
+          className="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="hideOpen"
+          checked={settings.hideOpen}
+          onChange={(e) => setSettings({ ...settings, hideOpen: e.target.checked })}
+        />
+        <label className="form-check-label" htmlFor="hideOpen">
+          Hide open (no-3rd) voicings
+        </label>
+      </div>
+
       <div className="d-flex gap-2">
         <button className="btn btn-outline-secondary flex-fill" onClick={() => play(SAMPLE)}>
           ▶︎ Preview (D)

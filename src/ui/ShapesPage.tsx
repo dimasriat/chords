@@ -19,11 +19,11 @@ interface ShapesPageProps {
 }
 
 export function ShapesPage({ symbol, onBack, onSave }: ShapesPageProps) {
-  const { play } = usePlayer();
+  const { play, settings } = usePlayer();
 
   let shapes;
   try {
-    shapes = topK(symbol, MAX_SHAPES);
+    shapes = topK(symbol, MAX_SHAPES, undefined, { hideOpen: settings.hideOpen });
   } catch {
     shapes = [];
   }

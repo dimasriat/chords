@@ -9,11 +9,14 @@ import { usePlayer } from "./PlayerContext";
 const SHAPES_PER_CHORD = 8;
 
 function BridgeCard({ bridge }: { bridge: Bridge }) {
-  const { playSequence } = usePlayer();
+  const { playSequence, settings } = usePlayer();
   // All shape options for each chord in the sequence (easiest first).
   const options = useMemo(
-    () => bridge.sequence.map((sym) => topK(sym, SHAPES_PER_CHORD).map((v) => v.frets)),
-    [bridge],
+    () =>
+      bridge.sequence.map((sym) =>
+        topK(sym, SHAPES_PER_CHORD, undefined, { hideOpen: settings.hideOpen }).map((v) => v.frets),
+      ),
+    [bridge, settings.hideOpen],
   );
   // Which shape is chosen per chord position.
   const [picks, setPicks] = useState<number[]>(() => bridge.sequence.map(() => 0));

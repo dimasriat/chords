@@ -4,12 +4,15 @@ export interface Settings {
   patternName: string;
   bpm: number;
   loop: boolean;
+  /** Hide "open" voicings that leave out the chord's 3rd. */
+  hideOpen: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   patternName: "Strum",
   bpm: 100,
   loop: false,
+  hideOpen: false, // show open voicings by default
 };
 
 export const MIN_BPM = 40;

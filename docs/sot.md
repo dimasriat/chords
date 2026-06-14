@@ -126,7 +126,9 @@ The chords *Dimas knows / wants*. The source of truth for what he plays.
 - **Voicing validity rule.** A candidate voicing is valid iff:
   1. it contains the chord's **essential tones** — triad = 1-3-5; 7th/9th = root, 3rd,
      7th (+ 9th for a 9 chord). The **5th may be omitted on 7th/9th chords** (kept
-     mandatory on plain triads).
+     mandatory on plain triads). On a **9th-or-higher chord that keeps its 7th, the
+     3rd may also be omitted** — these lush "open" voicings (e.g. Dmaj9 as `xx0220`)
+     are allowed, flagged **"no 3rd"** in the UI, and hidable via a Settings toggle.
   2. **root (or slash bass) is the lowest sounding string**;
   3. it has **≥4 sounding strings** (≤6). Doubling tones (e.g. an extra bass root) is
      allowed.

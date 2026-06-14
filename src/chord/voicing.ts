@@ -41,6 +41,8 @@ export interface Voicing {
   /** Sounded pitch-classes, low → high string. */
   notes: number[];
   features: VoicingFeatures;
+  /** True when the chord's 3rd is left out (an "open"/ambiguous voicing). */
+  omitsThird: boolean;
 }
 
 const pc = (string: number, fret: number) => (OPEN_MIDI[string]! + fret) % 12;
@@ -144,7 +146,8 @@ export function generateVoicings(input: string | ParsedChord): Voicing[] {
         .map((f, i) => ({ f, i }))
         .filter(({ f }) => f !== MUTED)
         .map(({ f, i }) => pc(i, f));
-      results.push({ frets, notes, features: computeFeatures(frets) });
+      const omitsThird = tones.thirdPc !== null && !notes.includes(tones.thirdPc);
+      results.push({ frets, notes, features: computeFeatures(frets), omitsThird });
       return;
     }
     for (const f of perString[s]!) {
@@ -156,4 +159,19 @@ export function generateVoicings(input: string | ParsedChord): Voicing[] {
 
   recurse(0);
   return results;
+}
+
+/** Does this voicing of the given chord leave out the chord's 3rd? (UI badge.) */
+export function voicingOmitsThird(frets: number[], input: string | ParsedChord): boolean {
+  let tones;
+  try {
+    tones = computeChordTones(input);
+  } catch {
+    return false;
+  }
+  if (tones.thirdPc === null) return false;
+  const sounded = frets
+    .map((f, i) => (f === MUTED ? -1 : pc(i, f)))
+    .filter((p) => p >= 0);
+  return !sounded.includes(tones.thirdPc);
 }

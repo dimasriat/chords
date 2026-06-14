@@ -1,5 +1,5 @@
 import { test, expect, describe } from "bun:test";
-import { generateVoicings, isValidVoicing, computeFeatures } from "./voicing";
+import { generateVoicings, isValidVoicing, computeFeatures, voicingOmitsThird } from "./voicing";
 import { computeChordTones } from "./chordTones";
 
 const has = (frets: number[][], target: number[]) =>
@@ -81,5 +81,25 @@ describe("generateVoicings", () => {
     const v = generateVoicings("D")[0]!;
     expect(v.notes.length).toBeGreaterThanOrEqual(4);
     expect(v.features).toBeDefined();
+  });
+
+  test("Dmaj9 generates the no-3rd shape xx0220, flagged omitsThird", () => {
+    const xx0220 = generateVoicings("Dmaj9").find((v) => v.frets.join(",") === "-1,-1,0,2,2,0");
+    expect(xx0220).toBeDefined();
+    expect(xx0220!.omitsThird).toBe(true);
+  });
+
+  test("a complete D major voicing does not omit the 3rd", () => {
+    expect(generateVoicings("D").every((v) => v.omitsThird === false)).toBe(true);
+  });
+});
+
+describe("voicingOmitsThird", () => {
+  test("Dmaj9 as xx0220 omits the 3rd; open D does not", () => {
+    expect(voicingOmitsThird([-1, -1, 0, 2, 2, 0], "Dmaj9")).toBe(true);
+    expect(voicingOmitsThird([-1, -1, 0, 2, 3, 2], "D")).toBe(false);
+  });
+  test("sus chords (no real 3rd) are never flagged", () => {
+    expect(voicingOmitsThird([-1, -1, 0, 2, 3, 0], "Dsus4")).toBe(false);
   });
 });

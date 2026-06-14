@@ -53,4 +53,12 @@ describe("topK / easiest", () => {
   test("works for a rich chord", () => {
     expect(easiest("Bm9")).toBeDefined();
   });
+
+  test("hideOpen filter excludes no-3rd voicings (Dmaj9 xx0220)", () => {
+    const withOpen = topK("Dmaj9", 30);
+    const noOpen = topK("Dmaj9", 30, undefined, { hideOpen: true });
+    expect(withOpen.some((v) => v.frets.join(",") === "-1,-1,0,2,2,0")).toBe(true);
+    expect(noOpen.some((v) => v.frets.join(",") === "-1,-1,0,2,2,0")).toBe(false);
+    expect(noOpen.every((v) => !v.omitsThird)).toBe(true);
+  });
 });

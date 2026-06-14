@@ -16,6 +16,8 @@ export interface ChordTones {
   pitchClasses: number[];
   /** Pitch-classes that must all be present for a voicing to be valid. */
   essentialPcs: number[];
+  /** Pitch-class of the chord's 3rd (maj/min/dim/aug), or null for sus/no-3rd chords. */
+  thirdPc: number | null;
 }
 
 /** Triad intervals (semitones from root): [third, fifth]. */
@@ -117,22 +119,30 @@ export function computeChordTones(input: string | ParsedChord): ChordTones {
   const bassPc = parsed.bass ? noteToSemitone(parsed.bass) : rootPc;
 
   const { intervals, third, fifth, hasExtension, seventh, hasNamedNinth } = intervalSet(parsed);
+  const toPc = (i: number) => ((rootPc + i) % 12 + 12) % 12;
 
-  // Essential tones: root + third always; fifth only on a plain triad; the 7th and
-  // a named 9th are essential when present (SOT §7 voicing validity rule).
-  const essentialIntervals = new Set<number>([0, third]);
-  // The 5th is droppable on extended chords — except diminished, whose b5 is a
-  // defining tone (dim/dim7 are stacks of minor thirds).
+  // Chords with a real (maj/min/dim/aug) 3rd vs sus chords, whose "third" is the 2/4.
+  const hasRealThird = ["maj", "min", "dim", "aug"].includes(parsed.quality);
+  // On a 9th-or-higher chord that keeps its 7th, the 3rd may be omitted (the lush
+  // "no 3rd" / open voicings guitarists use, e.g. Dmaj9 as xx0220).
+  const NINTH_OR_HIGHER = new Set(["9", "maj9", "11", "13"]);
+  const thirdOptional =
+    seventh !== null && parsed.extensions.some((e) => NINTH_OR_HIGHER.has(e));
+
+  // Essential tones: root always; the 3rd unless it's an optional/sus case; the 5th
+  // only on a plain triad (or any diminished, whose b5 is defining); the 7th and a
+  // named 9th when present (SOT §7).
+  const essentialIntervals = new Set<number>([0]);
+  if (!hasRealThird || !thirdOptional) essentialIntervals.add(third);
   if (!hasExtension || parsed.quality === "dim") essentialIntervals.add(fifth);
   if (seventh !== null) essentialIntervals.add(seventh);
   if (hasNamedNinth) essentialIntervals.add(2);
-
-  const toPc = (i: number) => ((rootPc + i) % 12 + 12) % 12;
 
   return {
     rootPc,
     bassPc,
     pitchClasses: [...new Set([...intervals].map(toPc))],
     essentialPcs: [...new Set([...essentialIntervals].map(toPc))],
+    thirdPc: hasRealThird ? toPc(third) : null,
   };
 }

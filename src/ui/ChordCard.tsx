@@ -5,6 +5,7 @@
 
 import React from "react";
 import { ChordDiagram } from "./ChordDiagram";
+import { voicingOmitsThird } from "../chord/voicing";
 
 interface ChordCardProps {
   symbol: string;
@@ -13,10 +14,18 @@ interface ChordCardProps {
 }
 
 export function ChordCard({ symbol, frets, children }: ChordCardProps) {
+  const open = frets ? voicingOmitsThird(frets, symbol) : false;
   return (
     <div className="card h-100 text-center">
       <div className="card-body p-3">
-        <div className="fw-bold mb-1">{symbol}</div>
+        <div className="fw-bold mb-1">
+          {symbol}
+          {open && (
+            <span className="badge text-bg-light border ms-1 fw-normal" title="3rd omitted — open/ambiguous voicing">
+              no 3rd
+            </span>
+          )}
+        </div>
         {frets ? (
           <>
             <ChordDiagram frets={frets} />

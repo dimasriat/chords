@@ -17,7 +17,7 @@ interface FindPageProps {
 }
 
 export function FindPage({ onSave, onShowShapes }: FindPageProps) {
-  const { play } = usePlayer();
+  const { play, settings } = usePlayer();
   const [input, setInput] = useState("");
   const [variations, setVariations] = useState<VariationView[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +30,7 @@ export function FindPage({ onSave, onShowShapes }: FindPageProps) {
     try {
       setVariations(
         generateVariations(symbol).map((s) => {
-          const v = easiest(s);
+          const v = easiest(s, undefined, { hideOpen: settings.hideOpen });
           return { symbol: s, frets: v ? v.frets : null };
         }),
       );
