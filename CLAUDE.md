@@ -172,3 +172,5 @@ bd close <id>         # Complete work
 - **Issue notes replace PR reviews** — since work may be local-only, use `bd update <id> --notes` to record completion checks, drift analysis, and decisions.
 - **Commit after closing each issue** — every `bd close` must be immediately followed by a git commit. Do not batch multiple issues into one commit.
 - **Conventional title prefixes** — both beads issue titles AND git commit messages must start with a Conventional Commits type prefix: `feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`, `perf:`, `build:`, `ci:`, `style:`. Example issue title: `feat: chord symbol parser`. Example commit: `test: failing tests for chord parser`.
+- **Never mix the test DB with the deployed DB** — tests MUST use an isolated database (`:memory:` or a throwaway temp file), never the production data file. Production code must never use `:memory:`. A test run must be incapable of reading, writing, or deleting deployed data.
+- **Deployed DB lives in `data/`** — the sqlite file is `data/chords.db` (override via `CHORDS_DB_PATH`). The entire `data/` directory is gitignored and never committed.

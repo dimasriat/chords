@@ -37,3 +37,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .dolt/
 *.db
 .beads-credential-key
+
+# Deployed app data (sqlite DB lives here; never committed)
+data/
