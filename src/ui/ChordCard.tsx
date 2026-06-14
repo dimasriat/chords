@@ -5,7 +5,6 @@
 
 import React from "react";
 import { ChordDiagram } from "./ChordDiagram";
-import { resolveNoteNames } from "../chord/noteResolver";
 
 interface ChordCardProps {
   symbol: string;
@@ -21,7 +20,6 @@ export function ChordCard({ symbol, frets, children }: ChordCardProps) {
         {frets ? (
           <>
             <ChordDiagram frets={frets} />
-            <div className="small text-muted mt-1">{resolveNoteNames(frets).join(" ")}</div>
             {children && <div className="d-flex gap-1 mt-2">{children}</div>}
           </>
         ) : (

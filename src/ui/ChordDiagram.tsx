@@ -9,6 +9,8 @@
 
 import React from "react";
 import { computeFingering } from "../chord/fingering";
+import { OPEN_MIDI } from "../chord/voicing";
+import { semitoneToNote } from "../chord/notes";
 
 const MUTED = -1;
 const STRINGS = 6;
@@ -18,9 +20,11 @@ interface ChordDiagramProps {
   frets: number[];
   fingers?: number[];
   size?: number;
+  /** Show each string's sounding note, aligned under its string line. */
+  showNotes?: boolean;
 }
 
-export function ChordDiagram({ frets, fingers, size = 1 }: ChordDiagramProps) {
+export function ChordDiagram({ frets, fingers, size = 1, showNotes = true }: ChordDiagramProps) {
   const fingering = fingers ?? computeFingering(frets);
 
   const fretted = frets.filter((f) => f > 0);
@@ -38,7 +42,8 @@ export function ChordDiagram({ frets, fingers, size = 1 }: ChordDiagramProps) {
   const gridW = sx * (STRINGS - 1);
   const gridH = fy * FRET_ROWS;
   const width = left * 2 + gridW;
-  const height = top + gridH + 14;
+  const height = top + gridH + (showNotes ? 30 : 14);
+  const noteY = top + gridH + 16;
 
   const stringX = (s: number) => left + s * sx;
   const fretY = (row: number) => top + row * fy;
@@ -118,6 +123,15 @@ export function ChordDiagram({ frets, fingers, size = 1 }: ChordDiagramProps) {
           </g>
         );
       })}
+      {/* Sounding note under each string, aligned to the string line */}
+      {showNotes &&
+        frets.map((f, s) =>
+          f === MUTED ? null : (
+            <text key={`n${s}`} x={stringX(s)} y={noteY} fontSize={11} textAnchor="middle" fill="#0d6efd">
+              {semitoneToNote((OPEN_MIDI[s]! + f) % 12)}
+            </text>
+          ),
+        )}
     </svg>
   );
 }
