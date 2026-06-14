@@ -62,7 +62,9 @@ export function parseChord(input: string): ParsedChord {
   if (!root) {
     throw new Error(`Invalid root note in "${input}"`);
   }
-  let rest = main.slice(root.length);
+  // Normalise multi-letter quality keywords to lowercase (DMaj9 → Dmaj9, ASus4 →
+  // Asus4). Single "m" (minor) and accidentals are left untouched.
+  let rest = main.slice(root.length).replace(/maj|sus|dim|aug|add/gi, (m) => m.toLowerCase());
 
   // Triad quality. Order matters: check "sus*"/"dim"/"aug"/"maj" before bare "m".
   let quality: ChordQuality = "maj";

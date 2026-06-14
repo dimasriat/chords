@@ -76,6 +76,12 @@ describe("parseChord", () => {
     expect(parseChord("  Em  ")).toEqual({ root: "E", quality: "min", extensions: [], bass: null });
   });
 
+  test("quality keywords are case-insensitive (DMaj9, ASus4)", () => {
+    expect(parseChord("DMaj9")).toEqual({ root: "D", quality: "maj", extensions: ["maj9"], bass: null });
+    expect(parseChord("ASus4")).toEqual({ root: "A", quality: "sus4", extensions: [], bass: null });
+    expect(parseChord("CMAJ7")).toEqual({ root: "C", quality: "maj", extensions: ["maj7"], bass: null });
+  });
+
   // Invalid input must be rejected clearly
   test("rejects invalid input", () => {
     expect(() => parseChord("")).toThrow();
