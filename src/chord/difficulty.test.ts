@@ -1,0 +1,48 @@
+import { test, expect, describe } from "bun:test";
+import { DEFAULT_WEIGHTS, score, compare, topK, easiest } from "./difficulty";
+import { computeFeatures } from "./voicing";
+
+describe("score (SOT §7 starting weights)", () => {
+  test("open D ≈ 4.6 points", () => {
+    expect(score(computeFeatures([-1, -1, 0, 2, 3, 2]))).toBeCloseTo(4.6, 5);
+  });
+
+  test("F barre ≈ 13.6 points", () => {
+    expect(score(computeFeatures([1, 3, 3, 2, 1, 1]))).toBeCloseTo(13.6, 5);
+  });
+
+  test("accepts custom weights", () => {
+    const f = computeFeatures([-1, -1, 0, 2, 3, 2]);
+    expect(score(f, { ...DEFAULT_WEIGHTS, frettedCount: 0 })).toBeCloseTo(1.6, 5);
+  });
+});
+
+describe("compare", () => {
+  test("ranks the open shape easier than the barre", () => {
+    const open = computeFeatures([-1, -1, 0, 2, 3, 2]);
+    const barre = computeFeatures([1, 3, 3, 2, 1, 1]);
+    expect(compare({ features: open } as any, { features: barre } as any)).toBeLessThan(0);
+  });
+});
+
+describe("topK / easiest", () => {
+  test("returns at most k voicings, easiest first", () => {
+    const top = topK("D", 10);
+    expect(top.length).toBeGreaterThan(0);
+    expect(top.length).toBeLessThanOrEqual(10);
+    for (let i = 1; i < top.length; i++) {
+      expect(score(top[i]!.features)).toBeGreaterThanOrEqual(score(top[i - 1]!.features));
+    }
+  });
+
+  test("easiest(D) is an open-position, no-barre shape", () => {
+    const e = easiest("D")!;
+    expect(e.features.hasBarre).toBe(false);
+    // open D scores 4.6; the easiest must be at least that easy
+    expect(score(e.features)).toBeLessThanOrEqual(4.6);
+  });
+
+  test("works for a rich chord", () => {
+    expect(easiest("Bm9")).toBeDefined();
+  });
+});
