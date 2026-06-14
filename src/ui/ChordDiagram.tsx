@@ -33,7 +33,7 @@ export function ChordDiagram({ frets, fingers, size = 1 }: ChordDiagramProps) {
   // Geometry (in SVG user units, scaled by `size` via viewBox/width).
   const sx = 22; // string spacing
   const fy = 26; // fret spacing
-  const left = 26;
+  const left = 40; // wide enough that the "Nfr" position label isn't cropped
   const top = 34;
   const gridW = sx * (STRINGS - 1);
   const gridH = fy * FRET_ROWS;
@@ -86,7 +86,7 @@ export function ChordDiagram({ frets, fingers, size = 1 }: ChordDiagramProps) {
       ))}
       {/* Position label when sliding up the neck */}
       {!showNut && (
-        <text x={left - 10} y={fretY(0) + fy * 0.7} fontSize={13} textAnchor="end" fill="#555">
+        <text x={left - 12} y={fretY(0) + fy * 0.7} fontSize={12} textAnchor="end" fill="#555">
           {startFret}fr
         </text>
       )}
