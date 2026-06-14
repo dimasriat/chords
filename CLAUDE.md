@@ -171,3 +171,4 @@ bd close <id>         # Complete work
 - **SOT is authoritative** — if implementation differs from docs, the default is implementation adjusts. If docs need updating, document the decision in the issue notes.
 - **Issue notes replace PR reviews** — since work may be local-only, use `bd update <id> --notes` to record completion checks, drift analysis, and decisions.
 - **Commit after closing each issue** — every `bd close` must be immediately followed by a git commit. Do not batch multiple issues into one commit.
+- **Conventional title prefixes** — both beads issue titles AND git commit messages must start with a Conventional Commits type prefix: `feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`, `perf:`, `build:`, `ci:`, `style:`. Example issue title: `feat: chord symbol parser`. Example commit: `test: failing tests for chord parser`.
