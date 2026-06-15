@@ -58,7 +58,11 @@ export function computeFeatures(frets: number[]): VoicingFeatures {
   const position = fretted.length > 0 ? Math.max(...fretted) : 0;
   const minFret = fretted.length > 0 ? Math.min(...fretted) : 0;
 
-  const hasBarre = frettedCount > BARRE_THRESHOLD;
+  // A barre is the index finger laid flat across the lowest fret — it only counts
+  // as a barre (and only saves fingers) when that fret carries ≥2 strings. A single
+  // note on the lowest fret can't be barred, so each note is then its own finger.
+  const countAtMin = fretted.filter((f) => f === minFret).length;
+  const hasBarre = frettedCount > BARRE_THRESHOLD && countAtMin >= 2;
   // Effort in fingers: with a barre, the lowest fret is one finger and only the notes
   // above it need extra fingers; otherwise every fretted note needs its own finger.
   const notesAboveBarre = fretted.filter((f) => f > minFret).length;
@@ -87,6 +91,18 @@ export function isValidVoicing(frets: number[], tones: ChordTones): boolean {
   const fretted = soundedIdx.filter(({ f }) => f > 0).map(({ f }) => f);
   if (fretted.length > 1 && Math.max(...fretted) - Math.min(...fretted) > MAX_SPAN) {
     return false;
+  }
+
+  // Playability: at most 4 fingers. A barre (index finger across the lowest fret)
+  // only helps when that fret holds ≥2 strings — otherwise every fretted note is its
+  // own finger. A high cluster with a single note on a lower fret (e.g. x5777 8)
+  // would need 5 fingers and is not a real shape.
+  if (fretted.length > 0) {
+    const minFret = Math.min(...fretted);
+    const countAtMin = fretted.filter((f) => f === minFret).length;
+    const canBarre = fretted.length > BARRE_THRESHOLD && countAtMin >= 2;
+    const fingersNeeded = canBarre ? 1 + (fretted.length - countAtMin) : fretted.length;
+    if (fingersNeeded > 4) return false;
   }
 
   // Playability: an open string can't ring alongside notes high up the neck — those

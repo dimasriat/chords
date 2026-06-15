@@ -31,6 +31,15 @@ describe("computeFeatures", () => {
     // sounded strings span index 1..5, with string index 2 muted in the middle
     expect(computeFeatures([-1, 0, -1, 2, 3, 2]).innerMutes).toBe(1);
   });
+
+  test("no barre when the lowest fret carries a single string (D13 x5777 8)", () => {
+    // A barre is the index finger across the lowest fret — only a barre when that
+    // fret holds >=2 strings. Here fret 5 has one string, so it's not a barre and
+    // every fretted note is its own finger (5 — which makes the shape unplayable).
+    const f = computeFeatures([-1, 5, 7, 7, 7, 8]);
+    expect(f.hasBarre).toBe(false);
+    expect(f.fingers).toBe(5);
+  });
 });
 
 describe("isValidVoicing", () => {
@@ -88,6 +97,17 @@ describe("generateVoicings", () => {
     const frets = generateVoicings("F").map((v) => v.frets);
     expect(has(frets, [1, 3, 3, 2, 1, 1])).toBe(true); // full barre F kept
     expect(has(frets, [-1, -1, 3, 2, 1, 1])).toBe(false); // its top-4 subset removed
+  });
+
+  test("rejects unfingerable shapes — D13 drops x5777 8 (needs 5 fingers)", () => {
+    const frets = generateVoicings("D13").map((v) => v.frets);
+    expect(has(frets, [-1, 5, 7, 7, 7, 8])).toBe(false);
+  });
+
+  test("every generated voicing is playable with <=4 effective fingers (D13)", () => {
+    for (const v of generateVoicings("D13")) {
+      expect(v.features.fingers).toBeLessThanOrEqual(4);
+    }
   });
 
   test("each voicing carries notes and features", () => {

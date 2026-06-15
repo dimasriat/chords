@@ -19,21 +19,23 @@ export function computeFingering(frets: number[]): number[] {
   if (fretted.length === 0) return fingers;
 
   const minFret = Math.min(...fretted.map(({ f }) => f));
-  const isBarre = fretted.length > BARRE_THRESHOLD;
+  const countAtMin = fretted.filter(({ f }) => f === minFret).length;
+  // A barre = the index finger laid across the lowest fret, which only works (and is
+  // only worth it) when that fret holds ≥2 strings.
+  const isBarre = fretted.length > BARRE_THRESHOLD && countAtMin >= 2;
 
   if (isBarre) {
-    // Lowest fret → barre with finger 1; remaining distinct frets → 2, 3, 4.
+    // Lowest fret → barre with finger 1. Every note above the barre needs its own
+    // finger (2, 3, 4) — two notes on the same higher fret are still two fingers.
     for (const { f, i } of fretted) {
       if (f === minFret) fingers[i] = 1;
     }
-    const higher = [...new Set(fretted.filter(({ f }) => f > minFret).map(({ f }) => f))].sort(
-      (a, b) => a - b,
-    );
-    const fretToFinger = new Map<number, number>();
-    higher.forEach((fr, idx) => fretToFinger.set(fr, Math.min(idx + 2, 4)));
-    for (const { f, i } of fretted) {
-      if (f > minFret) fingers[i] = fretToFinger.get(f)!;
-    }
+    const above = fretted
+      .filter(({ f }) => f > minFret)
+      .sort((a, b) => a.f - b.f || a.i - b.i);
+    above.forEach(({ i }, idx) => {
+      fingers[i] = Math.min(idx + 2, 4);
+    });
   } else {
     // Assign ascending by fret, then string; cap at finger 4.
     const ordered = [...fretted].sort((a, b) => a.f - b.f || a.i - b.i);

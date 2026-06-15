@@ -132,9 +132,16 @@ The chords *Dimas knows / wants*. The source of truth for what he plays.
   2. **root (or slash bass) is the lowest sounding string**;
   3. it has **≥4 sounding strings** (≤6). Doubling tones (e.g. an extra bass root) is
      allowed.
-  4. **playability:** an open string may not ring alongside notes high up the neck
-     (fretted note > fret 4). "open string + fret 9" shapes are unplayable, not real
-     voicings.
+  4. **playability:**
+     - **≤4 fingers.** A **barre** is the index finger laid across the **lowest
+       fret**, and only counts as a barre — and only saves fingers — when that fret
+       carries **≥2 strings**. Every note *above* the barre is its own finger; two
+       notes on the same higher fret are two fingers, not a second barre. A shape that
+       would need >4 fingers (e.g. a high cluster with a lone note on a lower fret like
+       `x5777 8`) is unplayable and rejected.
+     - **open strings high up.** An open string may not ring alongside notes high up
+       the neck (fretted note > fret 4). "open string + fret 9" shapes are unplayable,
+       not real voicings.
 - **Difficulty model — feature-based linear scorer, learnable.** Each voicing is
   described by features and scored as `score = weights · features`; **easiest =
   lowest score**. Cost is driven by **effective fingers**, where a **barre is one
