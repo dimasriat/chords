@@ -7,10 +7,14 @@ import { resolveMidi, resolveNoteNames } from "../chord/noteResolver";
 import { usePlayer } from "./PlayerContext";
 
 const EMPTY = [-1, -1, -1, -1, -1, -1];
+const MAX_START_FRET = 12;
 
 export function FinderPage({ onSave }: { onSave: (symbol: string, frets: number[]) => void }) {
   const { play } = usePlayer();
   const [frets, setFrets] = useState<number[]>(EMPTY);
+  const [startFret, setStartFret] = useState(1);
+
+  const clamp = (n: number) => Math.min(MAX_START_FRET, Math.max(1, n));
 
   const pcs = resolveMidi(frets).map((m) => m % 12);
   const notes = resolveNoteNames(frets);
@@ -23,8 +27,31 @@ export function FinderPage({ onSave }: { onSave: (symbol: string, frets: number[
         Tap the fretboard to place fingers; tap above a string to toggle open/muted.
       </p>
 
+      <div className="d-flex align-items-center justify-content-center gap-2 mb-2">
+        <span className="small text-muted">Min fret</span>
+        <div className="btn-group btn-group-sm" role="group" aria-label="minimum fret">
+          <button
+            className="btn btn-outline-secondary"
+            disabled={startFret <= 1}
+            onClick={() => setStartFret((n) => clamp(n - 1))}
+          >
+            −
+          </button>
+          <span className="btn btn-outline-secondary disabled" style={{ minWidth: "3.5rem" }}>
+            {startFret}fr
+          </span>
+          <button
+            className="btn btn-outline-secondary"
+            disabled={startFret >= MAX_START_FRET}
+            onClick={() => setStartFret((n) => clamp(n + 1))}
+          >
+            ＋
+          </button>
+        </div>
+      </div>
+
       <div className="text-center mb-2">
-        <InteractiveFretboard frets={frets} onChange={setFrets} />
+        <InteractiveFretboard frets={frets} onChange={setFrets} startFret={startFret} />
       </div>
 
       <div className="text-center mb-3">
@@ -50,7 +77,13 @@ export function FinderPage({ onSave }: { onSave: (symbol: string, frets: number[
         >
           ＋ Save
         </button>
-        <button className="btn btn-outline-secondary" onClick={() => setFrets(EMPTY)}>
+        <button
+          className="btn btn-outline-secondary"
+          onClick={() => {
+            setFrets(EMPTY);
+            setStartFret(1);
+          }}
+        >
           Clear
         </button>
       </div>

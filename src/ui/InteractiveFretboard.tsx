@@ -2,8 +2,9 @@
  * Interactive fretboard — tap to build a voicing.
  *
  * Tap a fret cell to place/remove a finger on that string; tap the marker above a
- * string to toggle it open/muted. Shows the first 5 frets from the nut. Emits the
- * full fret array on every change so the parent can name the chord.
+ * string to toggle it open/muted. Shows a 5-fret window starting at `startFret`
+ * (default 1 = from the nut) so shapes up the neck can be built. Emits the full
+ * (absolute) fret array on every change so the parent can name the chord.
  */
 
 import React from "react";
@@ -16,9 +17,12 @@ const LABELS = ["E", "A", "D", "G", "B", "e"];
 interface Props {
   frets: number[];
   onChange: (frets: number[]) => void;
+  /** Lowest fret shown in the window (1 = from the nut). */
+  startFret?: number;
 }
 
-export function InteractiveFretboard({ frets, onChange }: Props) {
+export function InteractiveFretboard({ frets, onChange, startFret = 1 }: Props) {
+  const showNut = startFret === 1;
   const sx = 34;
   const fy = 38;
   const left = 46;
@@ -45,8 +49,14 @@ export function InteractiveFretboard({ frets, onChange }: Props) {
       role="application"
       aria-label="interactive fretboard"
     >
-      {/* Nut */}
-      <line x1={left} y1={top} x2={left + gridW} y2={top} stroke="#222" strokeWidth={5} />
+      {/* Nut (thick) or top fret line when sliding up the neck */}
+      <line x1={left} y1={top} x2={left + gridW} y2={top} stroke="#222" strokeWidth={showNut ? 5 : 1.5} />
+      {/* Position label when the window starts above the nut */}
+      {!showNut && (
+        <text x={left - 12} y={top + fy * 0.7} fontSize={13} textAnchor="end" fill="#555">
+          {startFret}fr
+        </text>
+      )}
       {/* Fret lines */}
       {Array.from({ length: FRET_ROWS }, (_, r) => (
         <line key={`f${r}`} x1={left} y1={fretY(r + 1)} x2={left + gridW} y2={fretY(r + 1)} stroke="#888" />
@@ -59,7 +69,7 @@ export function InteractiveFretboard({ frets, onChange }: Props) {
       {/* Clickable fret cells */}
       {Array.from({ length: STRINGS }, (_, s) =>
         Array.from({ length: FRET_ROWS }, (_, r) => {
-          const f = r + 1;
+          const f = startFret + r;
           return (
             <rect
               key={`c${s}-${f}`}
@@ -75,13 +85,13 @@ export function InteractiveFretboard({ frets, onChange }: Props) {
         }),
       )}
 
-      {/* Finger dots */}
+      {/* Finger dots (only those within the visible window) */}
       {frets.map((f, s) =>
-        f > 0 ? (
+        f >= startFret && f < startFret + FRET_ROWS ? (
           <circle
             key={`d${s}`}
             cx={stringX(s)}
-            cy={fretY(f - 1) + fy / 2}
+            cy={fretY(f - startFret) + fy / 2}
             r={11}
             fill="#0d6efd"
             style={{ pointerEvents: "none" }}
