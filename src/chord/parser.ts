@@ -20,8 +20,8 @@ export interface ParsedChord {
   bass: string | null;
 }
 
-/** A note name: A–G with an optional single sharp/flat. */
-const NOTE_RE = /^[A-G](#|b)?/;
+/** A note name: A–G (case-insensitive) with an optional single sharp/flat. */
+const NOTE_RE = /^[A-Ga-g](#|b)?/;
 
 /** Extension tokens, longest-first so "maj9" wins over "9", "add9" over "9". */
 const EXTENSION_TOKENS = [
@@ -34,7 +34,10 @@ const EXTENSION_TOKENS = [
 
 function matchNote(s: string): string | null {
   const m = s.match(NOTE_RE);
-  return m ? m[0] : null;
+  if (!m) return null;
+  // Normalise the note letter to uppercase so input is case-insensitive
+  // ("bm" → "Bm", "c" → "C"); the flat sign "b" stays lowercase.
+  return m[0][0]!.toUpperCase() + m[0].slice(1);
 }
 
 export function parseChord(input: string): ParsedChord {

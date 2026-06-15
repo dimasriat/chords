@@ -12,6 +12,17 @@ describe("parseChord", () => {
     });
   });
 
+  test("case-insensitive root: lowercase note letters are uppercased", () => {
+    expect(parseChord("bm")).toEqual({ root: "B", quality: "min", extensions: [], bass: null });
+    expect(parseChord("c")).toEqual({ root: "C", quality: "maj", extensions: [], bass: null });
+    expect(parseChord("f#m7")).toEqual({ root: "F#", quality: "min", extensions: ["7"], bass: null });
+    expect(parseChord("bb")).toEqual({ root: "Bb", quality: "maj", extensions: [], bass: null });
+  });
+
+  test("case-insensitive slash bass: c/e", () => {
+    expect(parseChord("c/e")).toEqual({ root: "C", quality: "maj", extensions: [], bass: "E" });
+  });
+
   test("slash chord: C/E", () => {
     expect(parseChord("C/E")).toEqual({
       root: "C",
