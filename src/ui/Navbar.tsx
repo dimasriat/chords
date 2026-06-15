@@ -1,8 +1,9 @@
 /** Bootstrap navbar switching between the app's pages. */
 
 import React from "react";
+import type { Tab } from "./routing";
 
-export type Tab = "find" | "library" | "finder" | "bridge" | "settings";
+export type { Tab };
 
 const TABS: Array<{ id: Tab; label: string }> = [
   { id: "find", label: "Find" },

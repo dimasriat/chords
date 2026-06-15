@@ -21,7 +21,15 @@ const server = Bun.serve({
   port: Number(process.env.PORT ?? 3000),
   hostname: process.env.BIND_HOST ?? "127.0.0.1",
   routes: {
+    // Client routes (see src/ui/routing.ts) — all serve the SPA shell so deep links
+    // and reloads work; the React router takes over from the URL on load.
     "/": index,
+    "/find": index,
+    "/library": index,
+    "/finder": index,
+    "/bridge": index,
+    "/settings": index,
+    "/shapes/:symbol": index,
 
     "/api/library": {
       GET: () => Response.json(listEntries(db)),

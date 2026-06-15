@@ -4,7 +4,8 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { Navbar, type Tab } from "./Navbar";
+import { Navbar } from "./Navbar";
+import { pathToRoute, routeToPath, type Route, type Tab } from "./routing";
 import { FindPage } from "./FindPage";
 import { LibraryPage } from "./LibraryPage";
 import { FinderPage } from "./FinderPage";
@@ -15,16 +16,29 @@ import { usePlayer } from "./PlayerContext";
 import { fetchLibrary, saveChord, removeChord, type LibraryEntry } from "./api";
 
 export function App() {
-  const [tab, setTab] = useState<Tab>("find");
-  const [shapesFor, setShapesFor] = useState<string | null>(null);
+  const [route, setRoute] = useState<Route>(() => pathToRoute(window.location.pathname));
   const [library, setLibrary] = useState<LibraryEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
   const { isPlaying, stop, settings } = usePlayer();
+  const { tab, shapesFor } = route;
 
-  function goToTab(t: Tab) {
-    setShapesFor(null);
-    setTab(t);
+  // Push a new route to the URL (History API) and re-render.
+  function navigate(next: Route) {
+    if (window.location.pathname !== routeToPath(next)) {
+      window.history.pushState(null, "", routeToPath(next));
+    }
+    setRoute(next);
   }
+
+  const goToTab = (t: Tab) => navigate({ tab: t, shapesFor: null });
+  const showShapes = (symbol: string) => navigate({ tab, shapesFor: symbol });
+
+  // Reflect browser back/forward into state.
+  useEffect(() => {
+    const onPop = () => setRoute(pathToRoute(window.location.pathname));
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   useEffect(() => {
     fetchLibrary().then(setLibrary).catch(() => setError("Couldn't load your library."));
@@ -54,12 +68,16 @@ export function App() {
       <div className="container py-3" style={{ maxWidth: 560 }}>
         {error && <div className="alert alert-warning py-2">{error}</div>}
         {shapesFor ? (
-          <ShapesPage symbol={shapesFor} onBack={() => setShapesFor(null)} onSave={handleSave} />
+          <ShapesPage
+            symbol={shapesFor}
+            onBack={() => goToTab(tab)}
+            onSave={handleSave}
+          />
         ) : (
           <>
-            {tab === "find" && <FindPage onSave={handleSave} onShowShapes={setShapesFor} />}
+            {tab === "find" && <FindPage onSave={handleSave} onShowShapes={showShapes} />}
             {tab === "library" && (
-              <LibraryPage library={library} onDelete={handleDelete} onShowShapes={setShapesFor} />
+              <LibraryPage library={library} onDelete={handleDelete} onShowShapes={showShapes} />
             )}
             {tab === "finder" && <FinderPage onSave={handleSave} />}
             {tab === "bridge" && <BridgePage />}
