@@ -105,11 +105,17 @@ export function isValidVoicing(frets: number[], tones: ChordTones): boolean {
     if (fingersNeeded > 4) return false;
   }
 
-  // Playability: an open string can't ring alongside notes high up the neck — those
-  // "open string + fret 9" combinations are unplayable, not real chord shapes.
-  const hasOpen = soundedIdx.some(({ f }) => f === 0);
-  if (hasOpen && fretted.length > 0 && Math.max(...fretted) > OPEN_POSITION_MAX) {
-    return false;
+  // Playability: an open string can't ring under a barre that crosses it, but it can
+  // ring when it sits *below* the fretted cluster — the hand partial-barres only the
+  // upper strings (e.g. easy Am9 x0 5 5 5 7, open A under a fret-5 cluster). So an
+  // open string alongside notes above fret 4 is allowed only when every open string
+  // is below every fretted note; otherwise it's an unplayable "open + fret 9" shape.
+  const openStrings = soundedIdx.filter(({ f }) => f === 0).map(({ i }) => i);
+  if (openStrings.length > 0 && fretted.length > 0 && Math.max(...fretted) > OPEN_POSITION_MAX) {
+    const frettedStrings = soundedIdx.filter(({ f }) => f > 0).map(({ i }) => i);
+    const maxOpenIdx = Math.max(...openStrings);
+    const minFrettedIdx = Math.min(...frettedStrings);
+    if (maxOpenIdx > minFrettedIdx) return false;
   }
 
   const allowed = new Set([...tones.pitchClasses, tones.bassPc]);

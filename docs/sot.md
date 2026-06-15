@@ -139,9 +139,12 @@ The chords *Dimas knows / wants*. The source of truth for what he plays.
        notes on the same higher fret are two fingers, not a second barre. A shape that
        would need >4 fingers (e.g. a high cluster with a lone note on a lower fret like
        `x5777 8`) is unplayable and rejected.
-     - **open strings high up.** An open string may not ring alongside notes high up
-       the neck (fretted note > fret 4). "open string + fret 9" shapes are unplayable,
-       not real voicings.
+     - **open strings high up.** An open string can't ring under a barre that crosses
+       it, but it *can* ring when it sits **below** the fretted cluster (lower string
+       index than every fretted note) — e.g. easy Am9 `x0 5 5 5 7` (open A under a
+       fret-5 cluster). So an open string is allowed alongside notes above fret 4 only
+       when every open string is below every fretted note; otherwise it's an
+       unplayable "open + fret 9" shape and is rejected.
 - **Difficulty model — feature-based linear scorer, learnable.** Each voicing is
   described by features and scored as `score = weights · features`; **easiest =
   lowest score**. Cost is driven by **effective fingers**, where a **barre is one

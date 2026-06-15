@@ -110,6 +110,27 @@ describe("generateVoicings", () => {
     }
   });
 
+  test("allows an open string below a high cluster — Am9 x0 5 5 5 7", () => {
+    // Open A (bass) rings under a fret-5 cluster on the upper strings; the index
+    // finger partial-barres only the upper strings, so the open A is fine.
+    const frets = generateVoicings("Am9").map((v) => v.frets);
+    expect(has(frets, [-1, 0, 5, 5, 5, 7])).toBe(true);
+  });
+
+  test("never lets an open string ring above a high fretted note", () => {
+    for (const v of generateVoicings("Am9")) {
+      const fretted = v.frets.map((f, i) => ({ f, i })).filter((x) => x.f > 0);
+      const open = v.frets.map((f, i) => ({ f, i })).filter((x) => x.f === 0);
+      if (!fretted.length || !open.length) continue;
+      const maxFret = Math.max(...fretted.map((x) => x.f));
+      if (maxFret > 4) {
+        const maxOpenIdx = Math.max(...open.map((x) => x.i));
+        const minFrettedIdx = Math.min(...fretted.map((x) => x.i));
+        expect(maxOpenIdx).toBeLessThan(minFrettedIdx);
+      }
+    }
+  });
+
   test("each voicing carries notes and features", () => {
     const v = generateVoicings("D")[0]!;
     expect(v.notes.length).toBeGreaterThanOrEqual(4);
