@@ -202,6 +202,16 @@ export function generateVoicings(input: string | ParsedChord): Voicing[] {
   );
 }
 
+/**
+ * The fret of the lowest fretted (non-open, non-muted) note, or `Infinity` when the
+ * shape has no fretted notes. Used to filter shapes by neck position — open strings
+ * are "empty" and never disqualify a shape.
+ */
+export function lowestFrettedFret(frets: number[]): number {
+  const fretted = frets.filter((f) => f > 0);
+  return fretted.length ? Math.min(...fretted) : Infinity;
+}
+
 /** Does this voicing of the given chord leave out the chord's 3rd? (UI badge.) */
 export function voicingOmitsThird(frets: number[], input: string | ParsedChord): boolean {
   let tones;

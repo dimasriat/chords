@@ -1,5 +1,11 @@
 import { test, expect, describe } from "bun:test";
-import { generateVoicings, isValidVoicing, computeFeatures, voicingOmitsThird } from "./voicing";
+import {
+  generateVoicings,
+  isValidVoicing,
+  computeFeatures,
+  voicingOmitsThird,
+  lowestFrettedFret,
+} from "./voicing";
 import { computeChordTones } from "./chordTones";
 
 const has = (frets: number[][], target: number[]) =>
@@ -145,6 +151,19 @@ describe("generateVoicings", () => {
 
   test("a complete D major voicing does not omit the 3rd", () => {
     expect(generateVoicings("D").every((v) => v.omitsThird === false)).toBe(true);
+  });
+});
+
+describe("lowestFrettedFret", () => {
+  test("returns the lowest fretted note's fret", () => {
+    expect(lowestFrettedFret([-1, -1, 0, 2, 3, 2])).toBe(2); // open D
+    expect(lowestFrettedFret([1, 3, 3, 2, 1, 1])).toBe(1); // F barre
+    expect(lowestFrettedFret([-1, 0, 5, 5, 5, 7])).toBe(5); // high Am9
+  });
+
+  test("ignores open (0) and muted (-1) strings", () => {
+    expect(lowestFrettedFret([0, 0, 0, 0, 0, 0])).toBe(Infinity); // all open
+    expect(lowestFrettedFret([-1, -1, -1, -1, -1, -1])).toBe(Infinity); // silent
   });
 });
 
